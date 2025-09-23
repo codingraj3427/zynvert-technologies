@@ -383,10 +383,6 @@ const footerPolicies = [
 ];
 
 // ======== PAGE COMPONENTS ========
-
-/**
- * New: Page Loader Component with "Z" animation
- */
 const PageLoader = () => (
   <div className="page-loader">
     <svg className="z-loader" viewBox="0 0 100 100">
@@ -402,6 +398,51 @@ const Header = ({ onNavigate }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Animated Placeholder Logic
+  const [placeholder, setPlaceholder] = useState("");
+  const placeholderTexts = useRef([
+    "Buy inverter...",
+    "Try our batteries...",
+    "Search for BMS...",
+    "Find connectors...",
+  ]);
+  const textIndex = useRef(0);
+  const charIndex = useRef(0);
+  const isDeleting = useRef(false);
+
+  useEffect(() => {
+    const type = () => {
+      const currentText = placeholderTexts.current[textIndex.current];
+      const typingSpeed = isDeleting.current ? 80 : 120;
+      let displayedText = isDeleting.current
+        ? currentText.substring(0, charIndex.current - 1)
+        : currentText.substring(0, charIndex.current + 1);
+
+      setPlaceholder(displayedText + "|");
+
+      if (isDeleting.current) {
+        charIndex.current--;
+      } else {
+        charIndex.current++;
+      }
+
+      if (!isDeleting.current && displayedText === currentText) {
+        setTimeout(() => {
+          isDeleting.current = true;
+          type();
+        }, 2000);
+      } else if (isDeleting.current && displayedText === "") {
+        isDeleting.current = false;
+        textIndex.current = (textIndex.current + 1) % placeholderTexts.current.length;
+        setTimeout(type, 500);
+      } else {
+        setTimeout(type, typingSpeed);
+      }
+    };
+    const timer = setTimeout(type, 250);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -426,82 +467,31 @@ const Header = ({ onNavigate }) => {
             onClick={() => setMobileMenuOpen(false)}
             className="close-btn"
           >
-            {" "}
-            <CloseIcon />{" "}
+            <CloseIcon />
           </button>
         </div>
         <div className="mobile-search-bar">
           <input type="text" placeholder="Search products..." />
           <button>
-            {" "}
-            <SearchIcon />{" "}
+            <SearchIcon />
           </button>
         </div>
         <nav className="mobile-nav-links">
-          <a
-            href="#home"
-            onClick={() => {
-              onNavigate("home");
-              setMobileMenuOpen(false);
-            }}
-            className="mobile-nav-link"
-          >
-            {" "}
-            Home{" "}
-          </a>
-          <a href="#shop" className="mobile-nav-link">
-            {" "}
-            Shop{" "}
-          </a>
-          <a href="#new" className="mobile-nav-link">
-            {" "}
-            New Arrivals{" "}
-          </a>
-          <a href="#contact" className="mobile-nav-link">
-            {" "}
-            Contact Us{" "}
-          </a>
-          <a href="#sale" className="mobile-nav-link sale">
-            {" "}
-            SALE 30% OFF!{" "}
-          </a>
+          <a href="#home" onClick={() => { onNavigate("home"); setMobileMenuOpen(false); }} className="mobile-nav-link">Home</a>
+          <a href="#shop" className="mobile-nav-link">Shop</a>
+          <a href="#new" className="mobile-nav-link">New Arrivals</a>
+          <a href="#contact" className="mobile-nav-link">Contact Us</a>
+          <a href="#sale" className="mobile-nav-link sale">SALE 30% OFF!</a>
           <hr />
           <h4 className="mobile-nav-title">All Categories</h4>
           {navCategories.map((cat) => (
-            <a
-              href={`/category/${toUrlFriendly(cat.name)}`}
-              key={cat.name}
-              className="mobile-nav-link sub-link"
-            >
-              {" "}
-              {cat.name}{" "}
-            </a>
+            <a href={`/category/${toUrlFriendly(cat.name)}`} key={cat.name} className="mobile-nav-link sub-link">{cat.name}</a>
           ))}
           <hr />
           <h4 className="mobile-nav-title">My Account</h4>
-          <a
-            href="#auth"
-            onClick={() => {
-              onNavigate("auth");
-              setMobileMenuOpen(false);
-            }}
-            className="mobile-nav-link user-link"
-          >
-            {" "}
-            <UserIcon /> Sign In{" "}
-          </a>
-          <a href="#favorites" className="mobile-nav-link user-link">
-            {" "}
-            <HeartIcon /> Favorites{" "}
-          </a>
-          <a
-            href="#cart"
-            onClick={() => onNavigate("cart")}
-            className="action-item"
-          >
-            {" "}
-            <CartIcon /> <span>My Cart</span>{" "}
-          </a>
+          <a href="#auth" onClick={() => { onNavigate("auth"); setMobileMenuOpen(false); }} className="mobile-nav-link user-link"><UserIcon /> Sign In</a>
+          <a href="#favorites" className="mobile-nav-link user-link"><HeartIcon /> Favorites</a>
+          <a href="#cart" onClick={() => { onNavigate("cart"); setMobileMenuOpen(false); }} className="mobile-nav-link user-link"><CartIcon /><span>My Cart</span></a>
         </nav>
       </div>
     </div>
@@ -510,58 +500,38 @@ const Header = ({ onNavigate }) => {
   return (
     <header className="header">
       <MobileNav />
-      <div className="header-top">
-        <div className="logo-container">
-          <a
-            href="#home"
-            onClick={() => onNavigate("home")}
-            style={{ display: "flex", alignItems: "center", gap: "10px" }}
-          >
-            <LogoIcon />
-            <h1>Zynvert Technologies</h1>
-          </a>
+      <div className="header-content-wrapper">
+        <div className="header-top">
+          <div className="logo-container">
+            <a
+              href="#home"
+              onClick={() => onNavigate("home")}
+              style={{ display: "flex", alignItems: "center", gap: "10px" }}
+            >
+              <LogoIcon />
+              <h1>Zynvert</h1>
+            </a>
+          </div>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search for Batteries, Inverters, BMS..."
+            />
+            <button><SearchIcon /></button>
+          </div>
+          <div className="mobile-header-actions">
+            <a href="#cart" onClick={() => onNavigate("cart")} className="action-item-mobile"><CartIcon /></a>
+            <button className="hamburger-menu" onClick={() => setMobileMenuOpen(true)}><HamburgerIcon /></button>
+          </div>
+          <div className="user-actions">
+            <a href="#auth" onClick={() => onNavigate("auth")} className="action-item"><UserIcon /><span>Sign In</span></a>
+            <a href="#favorites" className="action-item"><HeartIcon /><span>Favorites</span></a>
+            <a href="#cart" onClick={() => onNavigate("cart")} className="action-item"><CartIcon /><span>My Cart</span></a>
+          </div>
         </div>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search for Batteries, Inverters, BMS..."
-          />
-          <button>
-            {" "}
-            <SearchIcon />{" "}
-          </button>
-        </div>
-        <button
-          className="hamburger-menu"
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          {" "}
-          <HamburgerIcon />{" "}
-        </button>
-        <div className="user-actions">
-          <a
-            href="#auth"
-            onClick={() => onNavigate("auth")}
-            className="action-item"
-          >
-            {" "}
-            <UserIcon /> <span>Sign In</span>{" "}
-          </a>
-          <a href="#favorites" className="action-item">
-            {" "}
-            <HeartIcon /> <span>Favorites</span>{" "}
-          </a>
-          <a
-            href="#cart"
-            onClick={() => {
-              onNavigate("cart");
-              setMobileMenuOpen(false);
-            }}
-            className="mobile-nav-link user-link"
-          >
-            {" "}
-            <CartIcon /> My Cart{" "}
-          </a>
+        <div className="mobile-search-container">
+          <input type="text" placeholder={placeholder} readOnly />
+          <button><SearchIcon /></button>
         </div>
       </div>
       <nav className="navbar">
@@ -570,7 +540,7 @@ const Header = ({ onNavigate }) => {
             className="categories-button"
             onClick={() => setDropdownOpen(!isDropdownOpen)}
           >
-            <GridIcon /> All Categories{" "}
+            <GridIcon /> All Categories
             <span className={`arrow ${isDropdownOpen ? "up" : "down"}`}></span>
           </button>
           {isDropdownOpen && (
@@ -581,7 +551,7 @@ const Header = ({ onNavigate }) => {
                   className="dropdown-item"
                   key={category.name}
                 >
-                  <span>{category.name}</span>{" "}
+                  <span>{category.name}</span>
                   <span className="chevron">›</span>
                 </a>
               ))}
@@ -589,30 +559,13 @@ const Header = ({ onNavigate }) => {
           )}
         </div>
         <div className="nav-links">
-          <a
-            href="#home"
-            onClick={() => onNavigate("home")}
-            className="nav-link active"
-          >
-            {" "}
-            Home{" "}
-          </a>
-          <a href="#shop" className="nav-link">
-            {" "}
-            Shop{" "}
-          </a>
-          <a href="#new-arrivals" className="nav-link">
-            {" "}
-            New Arrivals{" "}
-          </a>
-          <a href="#contact" className="nav-link">
-            {" "}
-            Contact{" "}
-          </a>
+          <a href="#home" onClick={() => onNavigate("home")} className="nav-link active">Home</a>
+          <a href="#shop" className="nav-link">Shop</a>
+          <a href="#new-arrivals" className="nav-link">New Arrivals</a>
+          <a href="#contact" className="nav-link">Contact</a>
         </div>
         <div className="nav-promo">
-          {" "}
-          <a href="/sale">SALE 30% OFF!</a>{" "}
+          <a href="/sale">SALE 30% OFF!</a>
         </div>
       </nav>
     </header>
@@ -621,361 +574,193 @@ const Header = ({ onNavigate }) => {
 
 const HeroSection = () => (
   <section className="hero-section section-reveal">
-    {" "}
     <div className="hero-card large">
-      {" "}
-      <h2>Integrated Solar Inverters</h2>{" "}
-      <p>Our flagship product for reliable, off-grid power.</p>{" "}
-      <button>Shop Now</button>{" "}
-    </div>{" "}
+      <h2>Integrated Solar Inverters</h2>
+      <p>Our flagship product for reliable, off-grid power.</p>
+      <button>Shop Now</button>
+    </div>
     <div className="hero-card-grid">
-      {" "}
-      <div className="hero-card small">
-        {" "}
-        <h3>Lithium-Ion Packs</h3> <p>High-density power</p>{" "}
-        <a href="/shop/li-ion">Explore →</a>{" "}
-      </div>{" "}
-      <div className="hero-card small">
-        {" "}
-        <h3>LiFePO4 Batteries</h3> <p>Safe and long-lasting</p>{" "}
-        <a href="/shop/lifepo4">Explore →</a>{" "}
-      </div>{" "}
-      <div className="hero-card small">
-        {" "}
-        <h3>BMS Systems</h3> <p>Protect your investment</p>{" "}
-        <a href="/shop/bms">Explore →</a>{" "}
-      </div>{" "}
-      <div className="hero-card small">
-        {" "}
-        <h3>Accessories</h3> <p>Wires, Connectors & More</p>{" "}
-        <a href="/shop/accessories">Explore →</a>{" "}
-      </div>{" "}
-    </div>{" "}
+      <div className="hero-card small"><h3>Lithium-Ion Packs</h3><p>High-density power</p><a href="/shop/li-ion">Explore →</a></div>
+      <div className="hero-card small"><h3>LiFePO4 Batteries</h3><p>Safe and long-lasting</p><a href="/shop/lifepo4">Explore →</a></div>
+      <div className="hero-card small"><h3>BMS Systems</h3><p>Protect your investment</p><a href="/shop/bms">Explore →</a></div>
+      <div className="hero-card small"><h3>Accessories</h3><p>Wires, Connectors & More</p><a href="/shop/accessories">Explore →</a></div>
+    </div>
   </section>
 );
+
 const PopularCategories = () => (
   <section className="page-section section-reveal">
-    {" "}
-    <h2 className="section-title">Popular Categories</h2>{" "}
+    <h2 className="section-title">Popular Categories</h2>
     <div className="category-grid">
-      {" "}
       {popularCategories.map((category) => (
         <div key={category.name} className="category-card">
-          {" "}
-          <img src={category.image} alt={category.name} />{" "}
-          <h3>{category.name}</h3>{" "}
+          <img src={category.image} alt={category.name} />
+          <h3>{category.name}</h3>
         </div>
-      ))}{" "}
-    </div>{" "}
+      ))}
+    </div>
   </section>
 );
+
 const FeaturedProducts = () => (
   <section className="page-section bg-light section-reveal">
-    {" "}
-    <h2 className="section-title">Our Featured Products</h2>{" "}
+    <h2 className="section-title">Our Featured Products</h2>
     <div className="product-grid">
-      {" "}
       {featuredProducts.map((product) => (
         <div key={product.name} className="product-card">
-          {" "}
           <div className="product-image-container">
-            {" "}
-            <img src={product.image} alt={product.name} />{" "}
-          </div>{" "}
+            <img src={product.image} alt={product.name} />
+          </div>
           <div className="product-info">
-            {" "}
-            <h3 className="product-name">{product.name}</h3>{" "}
-            <p className="product-price">{product.price}</p>{" "}
-            <button className="add-to-cart-btn">Add to Cart</button>{" "}
-          </div>{" "}
+            <h3 className="product-name">{product.name}</h3>
+            <p className="product-price">{product.price}</p>
+            <button className="add-to-cart-btn">Add to Cart</button>
+          </div>
         </div>
-      ))}{" "}
-    </div>{" "}
+      ))}
+    </div>
   </section>
 );
+
 const ShowcaseSection = () => (
   <section className="page-section section-reveal">
-    {" "}
-    <h2 className="section-title">Recently Launched</h2>{" "}
+    <h2 className="section-title">Recently Launched</h2>
     <div className="showcase-section">
-      {" "}
       <div className="showcase-left">
-        {" "}
         <div className="showcase-banner">
-          {" "}
-          <h2>Online Electronics Store</h2>{" "}
-          <p>Just a Click to Get Your Electronics</p> <button>Shop Now</button>{" "}
-        </div>{" "}
+          <h2>Online Electronics Store</h2>
+          <p>Just a Click to Get Your Electronics</p> <button>Shop Now</button>
+        </div>
         <ul className="showcase-category-list">
-          {" "}
           {showcaseCategories.map((cat) => (
             <li key={cat}>
-              {" "}
-              <a href={`/category/${toUrlFriendly(cat)}`}>{cat}</a>{" "}
+              <a href={`/category/${toUrlFriendly(cat)}`}>{cat}</a>
             </li>
-          ))}{" "}
-        </ul>{" "}
-      </div>{" "}
+          ))}
+        </ul>
+      </div>
       <div className="showcase-right">
-        {" "}
         <div className="showcase-product-grid">
-          {" "}
           {recentlyLaunchedProducts.map((product) => (
             <div key={product.name} className="showcase-product-card">
-              {" "}
-              <img src={product.image} alt={product.name} />{" "}
+              <img src={product.image} alt={product.name} />
               <div className="showcase-product-info">
-                {" "}
-                <p className="showcase-product-name">{product.name}</p>{" "}
+                <p className="showcase-product-name">{product.name}</p>
                 <div className="showcase-product-pricing">
-                  {" "}
-                  <span className="current-price">{product.oldPrice}</span>{" "}
-                  <span className="old-price">{product.price}</span>{" "}
-                </div>{" "}
-              </div>{" "}
+                  <span className="current-price">{product.oldPrice}</span>
+                  <span className="old-price">{product.price}</span>
+                </div>
+              </div>
             </div>
-          ))}{" "}
-        </div>{" "}
-      </div>{" "}
-    </div>{" "}
+          ))}
+        </div>
+      </div>
+    </div>
   </section>
 );
+
 const ContactSection = () => (
   <section className="page-section bg-light section-reveal">
-    {" "}
-    <h2 className="section-title">Get In Touch</h2>{" "}
-    <p className="section-subtitle">
-      {" "}
-      Have questions? We'd love to hear from you.{" "}
-    </p>{" "}
+    <h2 className="section-title">Get In Touch</h2>
+    <p className="section-subtitle">Have questions? We'd love to hear from you.</p>
     <form className="contact-form">
-      {" "}
       <div className="form-row">
-        {" "}
-        <input type="text" placeholder="Your Name" required />{" "}
-        <input type="email" placeholder="Your Email" required />{" "}
-      </div>{" "}
-      <textarea placeholder="Your Message" rows="6" required></textarea>{" "}
-      <button type="submit" className="submit-btn">
-        {" "}
-        Send Message{" "}
-      </button>{" "}
-    </form>{" "}
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+      </div>
+      <textarea placeholder="Your Message" rows="6" required></textarea>
+      <button type="submit" className="submit-btn">Send Message</button>
+    </form>
   </section>
 );
+
 const Footer = () => (
   <footer className="footer section-reveal">
-    {" "}
     <div className="footer-content">
-      {" "}
       <div className="footer-column about">
-        {" "}
-        <div className="logo-container">
-          {" "}
-          <FooterLogoIcon />{" "}
-        </div>{" "}
-        <p>Call us 10 AM - 6 PM</p>{" "}
-        <p className="phone-number">+91 9123708861</p>{" "}
+        <div className="logo-container"><FooterLogoIcon /></div>
+        <p>Call us 10 AM - 6 PM</p>
+        <p className="phone-number">+91 9123708861</p>
         <div className="social-icons">
-          {" "}
-          <a href="https://facebook.com" aria-label="Facebook">
-            {" "}
-            <FacebookIcon />{" "}
-          </a>{" "}
-          <a href="https://x.com" aria-label="X">
-            {" "}
-            <XIcon />{" "}
-          </a>{" "}
-          <a href="https://instagram.com" aria-label="Instagram">
-            {" "}
-            <InstagramIcon />{" "}
-          </a>{" "}
-          <a href="https://youtube.com" aria-label="YouTube">
-            {" "}
-            <YouTubeIcon />{" "}
-          </a>{" "}
-          <a href="https://telegram.org" aria-label="Telegram">
-            {" "}
-            <TelegramIcon />{" "}
-          </a>{" "}
-        </div>{" "}
-      </div>{" "}
+          <a href="https://facebook.com" aria-label="Facebook"><FacebookIcon /></a>
+          <a href="https://x.com" aria-label="X"><XIcon /></a>
+          <a href="https://instagram.com" aria-label="Instagram"><InstagramIcon /></a>
+          <a href="https://youtube.com" aria-label="YouTube"><YouTubeIcon /></a>
+          <a href="https://telegram.org" aria-label="Telegram"><TelegramIcon /></a>
+        </div>
+      </div>
       <div className="footer-column links">
-        {" "}
-        <h4>Categories</h4>{" "}
-        <ul>
-          {" "}
-          {footerCategories.map((cat) => (
-            <li key={cat}>
-              {" "}
-              <a href={`/category/${toUrlFriendly(cat)}`}>{cat}</a>{" "}
-            </li>
-          ))}{" "}
-        </ul>{" "}
-      </div>{" "}
+        <h4>Categories</h4>
+        <ul>{footerCategories.map((cat) => (<li key={cat}><a href={`/category/${toUrlFriendly(cat)}`}>{cat}</a></li>))}</ul>
+      </div>
       <div className="footer-column links">
-        {" "}
-        <h4>Our Policies</h4>{" "}
-        <ul>
-          {" "}
-          {footerPolicies.map((policy) => (
-            <li key={policy}>
-              {" "}
-              <a href={`/policy/${toUrlFriendly(policy)}`}>{policy}</a>{" "}
-            </li>
-          ))}{" "}
-        </ul>{" "}
-      </div>{" "}
+        <h4>Our Policies</h4>
+        <ul>{footerPolicies.map((policy) => (<li key={policy}><a href={`/policy/${toUrlFriendly(policy)}`}>{policy}</a></li>))}</ul>
+      </div>
       <div className="footer-column contact">
-        {" "}
-        <h4>Contact Us</h4>{" "}
-        <p>
-          {" "}
-          Debolina apartment Flat no-101 Ground floor, Kolkata - 700059, West
-          Bengal, India{" "}
-        </p>{" "}
-        <a href="mailto:support@zynvert.com">support@zynvert.com</a>{" "}
-      </div>{" "}
-    </div>{" "}
+        <h4>Contact Us</h4>
+        <p>Debolina apartment Flat no-101 Ground floor, Kolkata - 700059, West Bengal, India</p>
+        <a href="mailto:support@zynvert.com">support@zynvert.com</a>
+      </div>
+    </div>
     <div className="footer-bottom">
-      {" "}
-      <p>Copyright © {new Date().getFullYear()} Zynvert Technologies.</p>{" "}
+      <p>Copyright © {new Date().getFullYear()} Zynvert Technologies.</p>
       <div className="payment-info">
-        {" "}
-        <span>We Use Safe Payment For</span>{" "}
-        <img
-          src="https://placehold.co/150x25/ffffff/333?text=Payment+Methods"
-          alt="Payment Methods"
-        />{" "}
-      </div>{" "}
-    </div>{" "}
+        <span>We Use Safe Payment For</span>
+        <img src="https://placehold.co/150x25/ffffff/333?text=Payment+Methods" alt="Payment Methods" />
+      </div>
+    </div>
   </footer>
 );
 
-/**
- * NEW: AuthPage Component for Login and Registration
- */
 const AuthPage = () => {
   const [isLoginView, setIsLoginView] = useState(true);
-
   return (
     <div className="auth-page">
       <div className="auth-card section-reveal visible">
         <div className="auth-card-header">
           <h2>{isLoginView ? "Welcome Back!" : "Create Your Account"}</h2>
-          <p>
-            {isLoginView ? "Sign in to continue" : "Join us to start shopping"}
-          </p>
+          <p>{isLoginView ? "Sign in to continue" : "Join us to start shopping"}</p>
         </div>
-
         {isLoginView ? (
           <form className="auth-form">
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input type="email" id="email" required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input type="password" id="password" required />
-            </div>
-            <a href="#forgot" className="forgot-password">
-              Forgot Password?
-            </a>
-            <button type="submit" className="auth-btn">
-              Sign In
-            </button>
+            <div className="form-group"><label htmlFor="email">Email Address</label><input type="email" id="email" required /></div>
+            <div className="form-group"><label htmlFor="password">Password</label><input type="password" id="password" required /></div>
+            <a href="#forgot" className="forgot-password">Forgot Password?</a>
+            <button type="submit" className="auth-btn">Sign In</button>
           </form>
         ) : (
           <form className="auth-form">
             <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
-                <input type="text" id="firstName" required />
-              </div>
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
-                <input type="text" id="lastName" required />
-              </div>
+              <div className="form-group"><label htmlFor="firstName">First Name</label><input type="text" id="firstName" required /></div>
+              <div className="form-group"><label htmlFor="lastName">Last Name</label><input type="text" id="lastName" required /></div>
             </div>
-            <div className="form-group">
-              <label htmlFor="reg-email">Email Address</label>
-              <input type="email" id="reg-email" required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="contact">Contact Number</label>
-              <input type="tel" id="contact" required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="reg-password">Password</label>
-              <input type="password" id="reg-password" required />
-            </div>
-            <button type="submit" className="auth-btn">
-              Create Account
-            </button>
+            <div className="form-group"><label htmlFor="reg-email">Email Address</label><input type="email" id="reg-email" required /></div>
+            <div className="form-group"><label htmlFor="contact">Contact Number</label><input type="tel" id="contact" required /></div>
+            <div className="form-group"><label htmlFor="reg-password">Password</label><input type="password" id="reg-password" required /></div>
+            <button type="submit" className="auth-btn">Create Account</button>
           </form>
         )}
-
-        <div className="auth-divider">
-          <span>OR</span>
-        </div>
-
-        <button className="google-btn">
-          <GoogleIcon />
-          Sign {isLoginView ? "In" : "Up"} with Google
-        </button>
-
+        <div className="auth-divider"><span>OR</span></div>
+        <button className="google-btn"><GoogleIcon />Sign {isLoginView ? "In" : "Up"} with Google</button>
         <div className="auth-toggle">
           {isLoginView ? "Don't have an account?" : "Already have an account?"}
-          <button onClick={() => setIsLoginView(!isLoginView)}>
-            {isLoginView ? "Sign Up" : "Sign In"}
-          </button>
+          <button onClick={() => setIsLoginView(!isLoginView)}>{isLoginView ? "Sign Up" : "Sign In"}</button>
         </div>
       </div>
     </div>
   );
 };
 
-/**
- * NEW: CartPage Component
- */
 const CartPage = ({ onNavigate }) => {
-  // Mock data for cart items. This would come from your app's state.
   const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Zynvert 12V 100Ah LiFePO4 Battery",
-      price: 15999,
-      quantity: 1,
-      image: "https://placehold.co/150x150/eeeeee/333333?text=Zynvert+100Ah",
-    },
-    {
-      id: 2,
-      name: "4S 100A BMS with Active Balancer",
-      price: 2499,
-      quantity: 2,
-      image: "https://placehold.co/150x150/eeeeee/333333?text=4S+BMS",
-    },
+    { id: 1, name: "Zynvert 12V 100Ah LiFePO4 Battery", price: 15999, quantity: 1, image: "https://placehold.co/150x150/eeeeee/333333?text=Zynvert+100Ah" },
+    { id: 2, name: "4S 100A BMS with Active Balancer", price: 2499, quantity: 2, image: "https://placehold.co/150x150/eeeeee/333333?text=4S+BMS" },
   ]);
-
-  const handleQuantityChange = (id, amount) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const shipping = 50; // Example shipping cost
+  const handleQuantityChange = (id, amount) => { setCartItems(cartItems.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + amount) } : item)); };
+  const removeItem = (id) => { setCartItems(cartItems.filter((item) => item.id !== id)); };
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping = 50;
   const total = subtotal + shipping;
 
   if (cartItems.length === 0) {
@@ -984,9 +769,7 @@ const CartPage = ({ onNavigate }) => {
         <div className="empty-cart section-reveal visible">
           <h2>Your Cart is Empty</h2>
           <p>Looks like you haven't added anything to your cart yet.</p>
-          <button onClick={() => onNavigate("home")} className="auth-btn">
-            Continue Shopping
-          </button>
+          <button onClick={() => onNavigate("home")} className="auth-btn">Continue Shopping</button>
         </div>
       </div>
     );
@@ -996,64 +779,34 @@ const CartPage = ({ onNavigate }) => {
     <div className="cart-page section-reveal visible">
       <div className="cart-header">
         <h1>Your Shopping Cart</h1>
-        <button
-          onClick={() => onNavigate("home")}
-          className="continue-shopping-btn"
-        >
-          Continue Shopping
-        </button>
+        <button onClick={() => onNavigate("home")} className="continue-shopping-btn">Continue Shopping</button>
       </div>
       <div className="cart-layout">
         <div className="cart-items-container">
           {cartItems.map((item) => (
             <div key={item.id} className="cart-item">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="cart-item-image"
-              />
+              <img src={item.image} alt={item.name} className="cart-item-image" />
               <div className="cart-item-details">
                 <p className="cart-item-name">{item.name}</p>
                 <div className="quantity-selector">
-                  <button onClick={() => handleQuantityChange(item.id, -1)}>
-                    -
-                  </button>
+                  <button onClick={() => handleQuantityChange(item.id, -1)}>-</button>
                   <input type="text" value={item.quantity} readOnly />
-                  <button onClick={() => handleQuantityChange(item.id, 1)}>
-                    +
-                  </button>
+                  <button onClick={() => handleQuantityChange(item.id, 1)}>+</button>
                 </div>
               </div>
               <div className="cart-item-price-actions">
-                <p className="cart-item-price">
-                  ₹{(item.price * item.quantity).toLocaleString()}
-                </p>
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="remove-item-btn"
-                >
-                  Remove
-                </button>
+                <p className="cart-item-price">₹{(item.price * item.quantity).toLocaleString()}</p>
+                <button onClick={() => removeItem(item.id)} className="remove-item-btn">Remove</button>
               </div>
             </div>
           ))}
         </div>
-
         <div className="cart-summary-container">
           <h3>Order Summary</h3>
-          <div className="summary-row">
-            <span>Subtotal</span>
-            <span>₹{subtotal.toLocaleString()}</span>
-          </div>
-          <div className="summary-row">
-            <span>Shipping</span>
-            <span>₹{shipping.toLocaleString()}</span>
-          </div>
+          <div className="summary-row"><span>Subtotal</span><span>₹{subtotal.toLocaleString()}</span></div>
+          <div className="summary-row"><span>Shipping</span><span>₹{shipping.toLocaleString()}</span></div>
           <hr />
-          <div className="summary-row total">
-            <span>Total</span>
-            <span>₹{total.toLocaleString()}</span>
-          </div>
+          <div className="summary-row total"><span>Total</span><span>₹{total.toLocaleString()}</span></div>
           <button className="checkout-btn">Proceed to Checkout</button>
         </div>
       </div>
@@ -1071,7 +824,6 @@ const HomePage = () => (
   </>
 );
 
-// ======== MAIN APP COMPONENT ========
 // ======== MAIN APP COMPONENT ========
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -1102,13 +854,10 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "auth":
-        return <AuthPage />;
-      case "cart":
-        return <CartPage onNavigate={setCurrentPage} />;
+      case "auth": return <AuthPage />;
+      case "cart": return <CartPage onNavigate={setCurrentPage} />;
       case "home":
-      default:
-        return <HomePage />;
+      default: return <HomePage />;
     }
   };
 
