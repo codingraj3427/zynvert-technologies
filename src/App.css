@@ -29,19 +29,18 @@ html, body {
   line-height: 1.6;
   color: var(--text-color);
   background-color: var(--white-color);
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden; /* This is the correct place to prevent horizontal scrolling */
 }
 
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-x: hidden; /* Ensures no content breaks out horizontally */
+  /* Removed overflow-x property which was conflicting with sticky positioning */
 }
 
 main {
   flex-grow: 1;
-  /* Removed padding-top to allow content to flow naturally after the header */
 }
 
 a {
@@ -49,9 +48,21 @@ a {
   color: inherit;
 }
 
+/* ======== NEW: SCROLL REVEAL ANIMATION ======== */
+.section-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.6s ease-out;
+}
+
+.section-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
 /* ======== SECTION 1: HEADER & NAVBAR ======== */
 .header {
-  /* The header is no longer fixed, it's part of the document flow */
   background-color: var(--white-color);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   z-index: 1000;
@@ -668,7 +679,6 @@ a {
 
 .footer-column.about .logo-container {
     margin-bottom: 20px;
-    filter: grayscale(1) brightness(1.5); /* Make logo white for dark bg */
 }
 
 .footer-column p {
