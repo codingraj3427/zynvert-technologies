@@ -353,6 +353,8 @@ a {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  overscroll-behavior: contain; /* FIX: Prevents scroll chaining to the body */
+  transform: translateZ(0); /* FIX: Promotes to its own rendering layer to solve overlap issues */
 }
 
 .mobile-nav-overlay.open {
@@ -420,6 +422,8 @@ a {
   padding: 15px;
   overflow-y: auto;
   flex-grow: 1;
+  overscroll-behavior: contain; /* FIX: Ensures only the menu scrolls */
+  min-height: 0; /* ADDED: Fix for flexbox overflow bug */
 }
 
 .mobile-nav-link {

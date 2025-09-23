@@ -401,6 +401,7 @@ const Header = ({ onNavigate }) => {
 
   // Animated Placeholder Logic
   const [placeholder, setPlaceholder] = useState("");
+  const timeoutRef = useRef(null); // Ref to hold the timeout ID
   const placeholderTexts = useRef([
     "Buy inverter...",
     "Try our batteries...",
@@ -411,7 +412,23 @@ const Header = ({ onNavigate }) => {
   const charIndex = useRef(0);
   const isDeleting = useRef(false);
 
+  // FIX: This useEffect now depends on isMobileMenuOpen
   useEffect(() => {
+    // Cleanup function to stop any active animation timeout
+    const stopAnimation = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+
+    // If the mobile menu is open, stop the animation and set a static placeholder
+    if (isMobileMenuOpen) {
+      stopAnimation();
+      setPlaceholder("Search products...");
+      return; // Exit the effect early
+    }
+
+    // If the menu is closed, restart the animation
     const type = () => {
       const currentText = placeholderTexts.current[textIndex.current];
       const typingSpeed = isDeleting.current ? 80 : 120;
@@ -427,22 +444,24 @@ const Header = ({ onNavigate }) => {
         charIndex.current++;
       }
 
-      if (!isDeleting.current && displayedText === currentText) {
-        setTimeout(() => {
-          isDeleting.current = true;
-          type();
-        }, 2000);
-      } else if (isDeleting.current && displayedText === "") {
+      if (!isDeleting.current && charIndex.current > currentText.length) {
+        isDeleting.current = true;
+        timeoutRef.current = setTimeout(type, 2000);
+      } else if (isDeleting.current && charIndex.current === 0) {
         isDeleting.current = false;
         textIndex.current = (textIndex.current + 1) % placeholderTexts.current.length;
-        setTimeout(type, 500);
+        timeoutRef.current = setTimeout(type, 500);
       } else {
-        setTimeout(type, typingSpeed);
+        timeoutRef.current = setTimeout(type, typingSpeed);
       }
     };
-    const timer = setTimeout(type, 250);
-    return () => clearTimeout(timer);
-  }, []);
+    
+    // Start the animation
+    timeoutRef.current = setTimeout(type, 250);
+
+    // Return the cleanup function that will be called when the effect re-runs or unmounts
+    return stopAnimation;
+  }, [isMobileMenuOpen]); // Dependency array now includes isMobileMenuOpen
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -874,3 +893,4 @@ function App() {
 }
 
 export default App;
+
