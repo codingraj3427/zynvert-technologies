@@ -397,11 +397,12 @@ const PageLoader = () => (
 const Header = ({ onNavigate }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false); // NEW state to control search input
+  const [searchQuery, setSearchQuery] = useState(""); // NEW state for the search input value
   const dropdownRef = useRef(null);
 
-  // Animated Placeholder Logic
   const [placeholder, setPlaceholder] = useState("");
-  const timeoutRef = useRef(null); // Ref to hold the timeout ID
+  const timeoutRef = useRef(null);
   const placeholderTexts = useRef([
     "Buy inverter...",
     "Try our batteries...",
@@ -412,23 +413,22 @@ const Header = ({ onNavigate }) => {
   const charIndex = useRef(0);
   const isDeleting = useRef(false);
 
-  // FIX: This useEffect now depends on isMobileMenuOpen
+  // FIX: This useEffect now depends on isMobileMenuOpen AND isSearching
   useEffect(() => {
-    // Cleanup function to stop any active animation timeout
     const stopAnimation = () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
 
-    // If the mobile menu is open, stop the animation and set a static placeholder
-    if (isMobileMenuOpen) {
+    // If menu is open or user is searching, stop the animation
+    if (isMobileMenuOpen || isSearching) {
       stopAnimation();
-      setPlaceholder("Search products...");
-      return; // Exit the effect early
+      setPlaceholder("Search for products...");
+      return; // Exit the effect
     }
 
-    // If the menu is closed, restart the animation
+    // If the menu is closed and user is not searching, restart the animation
     const type = () => {
       const currentText = placeholderTexts.current[textIndex.current];
       const typingSpeed = isDeleting.current ? 80 : 120;
@@ -456,12 +456,10 @@ const Header = ({ onNavigate }) => {
       }
     };
     
-    // Start the animation
     timeoutRef.current = setTimeout(type, 250);
 
-    // Return the cleanup function that will be called when the effect re-runs or unmounts
     return stopAnimation;
-  }, [isMobileMenuOpen]); // Dependency array now includes isMobileMenuOpen
+  }, [isMobileMenuOpen, isSearching]); // Dependency array updated
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -549,7 +547,19 @@ const Header = ({ onNavigate }) => {
           </div>
         </div>
         <div className="mobile-search-container">
-          <input type="text" placeholder={placeholder} readOnly />
+          {/* FIX: Input is now interactive */}
+          <input
+            type="text"
+            placeholder={placeholder}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearching(true)}
+            onBlur={() => {
+              if (searchQuery === "") {
+                setIsSearching(false);
+              }
+            }}
+          />
           <button><SearchIcon /></button>
         </div>
       </div>
