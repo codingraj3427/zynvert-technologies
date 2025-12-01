@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/layout/Header/Header";
 import Footer from "./components/layout/Footer/Footer"; // This seems to be defined twice. Let's assume this is the correct one.
@@ -12,8 +12,6 @@ import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
 
 // ======== MOCK DATA ========
-
-
 
 const popularCategories = [
   {
@@ -116,7 +114,6 @@ const footerPolicies = [
   "About Us",
 ];
 
-
 // ======== HELPER FUNCTION ========
 const toUrlFriendly = (text) =>
   text
@@ -126,8 +123,6 @@ const toUrlFriendly = (text) =>
     .replace(/[^\w-]+/g, "");
 
 // ======== PAGE COMPONENTS ========
-
-
 
 const HomePage = () => (
   <>
@@ -142,7 +137,6 @@ const HomePage = () => (
     <ContactSection />
   </>
 );
-
 
 // ======== MAIN APP COMPONENT ========
 function App() {
@@ -162,6 +156,7 @@ function App() {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
             observer.unobserve(entry.target);
+            console.log("Hii");
           }
         });
       },
@@ -174,10 +169,13 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "auth": return <AuthPage />;
-      case "cart": return <CartPage onNavigate={setCurrentPage} />;
+      case "auth":
+        return <AuthPage />;
+      case "cart":
+        return <CartPage onNavigate={setCurrentPage} />;
       case "home":
-      default: return <HomePage />;
+      default:
+        return <HomePage />;
     }
   };
 
