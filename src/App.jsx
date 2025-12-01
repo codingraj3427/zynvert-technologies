@@ -162,7 +162,6 @@ function App() {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
             observer.unobserve(entry.target);
-            console.log("Revealed:", entry.target);
           }
         });
       },
