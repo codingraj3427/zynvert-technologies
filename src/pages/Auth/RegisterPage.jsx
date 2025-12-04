@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import GoogleIcon from "../../assets/icons/GoogleIcon";
+import AppleIcon from "../../assets/icons/AppleIcon";
 
 const RegisterPage = ({ onToggleView }) => {
   const [formData, setFormData] = useState({
@@ -120,6 +121,10 @@ const RegisterPage = ({ onToggleView }) => {
       <button className="google-btn">
         <GoogleIcon />
         Sign Up with Google
+      </button>
+      <button className="google-btn" style={{ marginTop: "10px" }}>
+        <AppleIcon />
+        Sign Up with Apple
       </button>
       <div className="auth-toggle">
         Already have an account?

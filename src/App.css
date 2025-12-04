@@ -354,7 +354,9 @@ a {
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   overscroll-behavior: contain; /* FIX: Prevents scroll chaining to the body */
-  transform: translateZ(0); /* FIX: Promotes to its own rendering layer to solve overlap issues */
+  transform: translateZ(
+    0
+  ); /* FIX: Promotes to its own rendering layer to solve overlap issues */
 }
 
 .mobile-nav-overlay.open {
@@ -1458,6 +1460,87 @@ a {
   }
 }
 
+/* ... (existing content) ... */
+
+/* ======== NEW: Contact Page Styles ======== */
+.contact-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+  padding: 20px 0;
+  text-align: center;
+}
+.contact-card {
+  background: var(--white-color);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border-top: 5px solid var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.contact-card h3 {
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+}
+.contact-card p,
+.contact-card a {
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+.contact-card a.phone-number {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+.contact-card .social-icons {
+  justify-content: center;
+  margin-top: 20px; /* Increased margin */
+  display: flex;
+  gap: 20px; /* Increased gap */
+}
+
+/* --- ADDED/UPDATED STYLES FOR SOCIAL ICONS --- */
+.contact-card .social-icons a {
+  padding: 12px; /* Added padding for larger clickable area */
+  border-radius: 50%; /* Made them circular */
+  background-color: var(--light-grey);
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.contact-card .social-icons a:hover {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+.contact-card .social-icons a svg {
+  width: 24px; /* Increased icon size */
+  height: 24px;
+}
+/* --- END ADDED/UPDATED STYLES --- */
+
+.contact-form {
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+  .contact-info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
 /* ======== NEW: Cart Styles for 480px ======== */
 @media (max-width: 480px) {
   .cart-page {
@@ -1495,4 +1578,3 @@ a {
     padding: 20px;
   }
 }
-
