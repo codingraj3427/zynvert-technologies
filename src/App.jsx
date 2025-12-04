@@ -4,6 +4,7 @@ import Header from "./components/layout/Header/Header";
 import Footer from "./components/layout/Footer/Footer"; // This seems to be defined twice. Let's assume this is the correct one.
 import AuthPage from "./pages/Auth/AuthPage";
 import CartPage from "./pages/Cart/CartPage";
+import ContactPage from "./pages/Contact/ContactPage";
 import HeroSection from "./pages/Home/HeroSection";
 import PopularCategories from "./pages/Home/PopularCategories";
 import FeaturedProducts from "./pages/Home/FeaturedProducts";
@@ -173,6 +174,8 @@ function App() {
         return <AuthPage />;
       case "cart":
         return <CartPage onNavigate={setCurrentPage} />;
+      case "contact":
+        return <ContactPage />;
       case "home":
       default:
         return <HomePage />;

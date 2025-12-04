@@ -9,7 +9,14 @@ import HamburgerIcon from "../../../assets/icons/HamburgerIcon";
 import Navbar from "../Navbar/Navbar";
 
 const navCategories = [
-  { name: "Lithium & LiFePO4 Batteries" }, { name: "Inverters & Solar" }, { name: "BMS & Protection Boards" }, { name: "Battery Packs" }, { name: "Wires & Connectors" }, { name: "Chargers & Power Supplies" }, { name: "Raw Cells & Holders" }, { name: "Tools & Accessories" },
+  { name: "Lithium & LiFePO4 Batteries" },
+  { name: "Inverters & Solar" },
+  { name: "BMS & Protection Boards" },
+  { name: "Battery Packs" },
+  { name: "Wires & Connectors" },
+  { name: "Chargers & Power Supplies" },
+  { name: "Raw Cells & Holders" },
+  { name: "Tools & Accessories" },
 ];
 
 const Header = ({ onNavigate, toUrlFriendly }) => {
@@ -65,13 +72,14 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
         timeoutRef.current = setTimeout(type, 2000);
       } else if (isDeleting.current && charIndex.current === 0) {
         isDeleting.current = false;
-        textIndex.current = (textIndex.current + 1) % placeholderTexts.current.length;
+        textIndex.current =
+          (textIndex.current + 1) % placeholderTexts.current.length;
         timeoutRef.current = setTimeout(type, 500);
       } else {
         timeoutRef.current = setTimeout(type, typingSpeed);
       }
     };
-    
+
     timeoutRef.current = setTimeout(type, 250);
 
     return stopAnimation;
@@ -100,21 +108,72 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
           </button>
         </div>
         <nav className="mobile-nav-links">
-          <a href="#home" onClick={() => { onNavigate("home"); setMobileMenuOpen(false); }} className="mobile-nav-link">Home</a>
-          <a href="#shop" className="mobile-nav-link">Shop</a>
-          <a href="#new" className="mobile-nav-link">New Arrivals</a>
-          <a href="#contact" className="mobile-nav-link">Contact Us</a>
-          <a href="#sale" className="mobile-nav-link sale">SALE 30% OFF!</a>
+          <a
+            href="#home"
+            onClick={() => {
+              onNavigate("home");
+              setMobileMenuOpen(false);
+            }}
+            className="mobile-nav-link"
+          >
+            Home
+          </a>
+          <a href="#shop" className="mobile-nav-link">
+            Shop
+          </a>
+          <a href="#new" className="mobile-nav-link">
+            New Arrivals
+          </a>
+          <a
+            href="#contact"
+            onClick={() => {
+              onNavigate("contact");
+              setMobileMenuOpen(false);
+            }}
+            className="mobile-nav-link"
+          >
+            Contact Us
+          </a>
+          <a href="#sale" className="mobile-nav-link sale">
+            SALE 30% OFF!
+          </a>
           <hr />
           <h4 className="mobile-nav-title">All Categories</h4>
           {navCategories.map((cat) => (
-            <a href={`/category/${toUrlFriendly(cat.name)}`} key={cat.name} className="mobile-nav-link sub-link">{cat.name}</a>
+            <a
+              href={`/category/${toUrlFriendly(cat.name)}`}
+              key={cat.name}
+              className="mobile-nav-link sub-link"
+            >
+              {cat.name}
+            </a>
           ))}
           <hr />
           <h4 className="mobile-nav-title">My Account</h4>
-          <a href="#auth" onClick={() => { onNavigate("auth"); setMobileMenuOpen(false); }} className="mobile-nav-link user-link"><UserIcon /> Sign In</a>
-          <a href="#favorites" className="mobile-nav-link user-link"><HeartIcon /> Favorites</a>
-          <a href="#cart" onClick={() => { onNavigate("cart"); setMobileMenuOpen(false); }} className="mobile-nav-link user-link"><CartIcon /><span>My Cart</span></a>
+          <a
+            href="#auth"
+            onClick={() => {
+              onNavigate("auth");
+              setMobileMenuOpen(false);
+            }}
+            className="mobile-nav-link user-link"
+          >
+            <UserIcon /> Sign In
+          </a>
+          <a href="#favorites" className="mobile-nav-link user-link">
+            <HeartIcon /> Favorites
+          </a>
+          <a
+            href="#cart"
+            onClick={() => {
+              onNavigate("cart");
+              setMobileMenuOpen(false);
+            }}
+            className="mobile-nav-link user-link"
+          >
+            <CartIcon />
+            <span>My Cart</span>
+          </a>
         </nav>
       </div>
     </div>
@@ -140,16 +199,46 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
               type="text"
               placeholder="Search for Batteries, Inverters, BMS..."
             />
-            <button><SearchIcon /></button>
+            <button>
+              <SearchIcon />
+            </button>
           </div>
           <div className="mobile-header-actions">
-            <a href="#cart" onClick={() => onNavigate("cart")} className="action-item-mobile"><CartIcon /></a>
-            <button className="hamburger-menu" onClick={() => setMobileMenuOpen(true)}><HamburgerIcon /></button>
+            <a
+              href="#cart"
+              onClick={() => onNavigate("cart")}
+              className="action-item-mobile"
+            >
+              <CartIcon />
+            </a>
+            <button
+              className="hamburger-menu"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <HamburgerIcon />
+            </button>
           </div>
           <div className="user-actions">
-            <a href="#auth" onClick={() => onNavigate("auth")} className="action-item"><UserIcon /><span>Sign In</span></a>
-            <a href="#favorites" className="action-item"><HeartIcon /><span>Favorites</span></a>
-            <a href="#cart" onClick={() => onNavigate("cart")} className="action-item"><CartIcon /><span>My Cart</span></a>
+            <a
+              href="#auth"
+              onClick={() => onNavigate("auth")}
+              className="action-item"
+            >
+              <UserIcon />
+              <span>Sign In</span>
+            </a>
+            <a href="#favorites" className="action-item">
+              <HeartIcon />
+              <span>Favorites</span>
+            </a>
+            <a
+              href="#cart"
+              onClick={() => onNavigate("cart")}
+              className="action-item"
+            >
+              <CartIcon />
+              <span>My Cart</span>
+            </a>
           </div>
         </div>
         <div className="mobile-search-container">
@@ -166,7 +255,9 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
               }
             }}
           />
-          <button><SearchIcon /></button>
+          <button>
+            <SearchIcon />
+          </button>
         </div>
       </div>
       <Navbar onNavigate={onNavigate} toUrlFriendly={toUrlFriendly} />
