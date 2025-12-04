@@ -59,7 +59,8 @@ const Navbar = ({ onNavigate, toUrlFriendly }) => {
         >
           Home
         </a>
-        <a href="#shop" className="nav-link">
+
+        <a href="#shop" onClick={() => onNavigate("shop")} className="nav-link">
           Shop
         </a>
         <a href="#new-arrivals" className="nav-link">

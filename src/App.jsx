@@ -11,6 +11,7 @@ import FeaturedProducts from "./pages/Home/FeaturedProducts";
 import ShowcaseSection from "./pages/Home/ShowcaseSection";
 import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
+import ShopPage from "./pages/Shop/ShopPage";
 
 // ======== MOCK DATA ========
 
@@ -172,6 +173,8 @@ function App() {
     switch (currentPage) {
       case "auth":
         return <AuthPage />;
+      case "shop":
+        return <ShopPage />;
       case "cart":
         return <CartPage onNavigate={setCurrentPage} />;
       case "contact":
