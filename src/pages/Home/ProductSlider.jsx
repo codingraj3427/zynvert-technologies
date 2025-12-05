@@ -137,9 +137,6 @@ const trendingProducts = [
 const ProductSlider = ({ title = "Trending Now", onNavigate, onAddToCart }) => {
   const scrollRef = useRef(null);
 
-  const handleManualScroll = () => {
-    console.log("Manual scroll disabled in continuous mode.");
-  };
 
   useEffect(() => {
     // ... (existing continuous scrolling effect omitted for brevity) ...

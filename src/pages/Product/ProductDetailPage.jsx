@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import HeartIcon from "../../assets/icons/HeartIcon";
+// import HeartIcon from "../../assets/icons/HeartIcon";
 import CartIcon from "../../assets/icons/CartIcon";
 import ProductCard from "../../components/common/ProductCard";
 

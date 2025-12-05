@@ -19,9 +19,8 @@ import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
 const popularCategories = [
   /* ... */
 ];
-const featuredProducts = [
-  /* ... */
-];
+
+
 const recentlyLaunchedProducts = [
   /* ... */
   {
