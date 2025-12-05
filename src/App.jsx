@@ -9,6 +9,7 @@ import HeroSection from "./pages/Home/HeroSection";
 import PopularCategories from "./pages/Home/PopularCategories";
 import FeaturedProducts from "./pages/Home/FeaturedProducts";
 import ShowcaseSection from "./pages/Home/ShowcaseSection";
+import ProductSlider from "./pages/Home/ProductSlider";
 import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
 import ShopPage from "./pages/Shop/ShopPage";
@@ -129,6 +130,7 @@ const toUrlFriendly = (text) =>
 const HomePage = () => (
   <>
     <HeroSection />
+    <ProductSlider title="⚡ Hot Deals & Trending Items" />
     <PopularCategories popularCategories={popularCategories} />
     <FeaturedProducts featuredProducts={featuredProducts} />
     <ShowcaseSection

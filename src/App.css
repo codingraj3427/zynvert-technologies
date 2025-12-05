@@ -1756,3 +1756,109 @@ a {
     gap: 10px;
   }
 }
+/* ... (existing App.css content) ... */
+
+/* ------------------------------------- */
+/* ======== NEW: Product Slider Styles (Continuous) ======== */
+/* ------------------------------------- */
+
+.product-slider-section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  /* Optional: Add a subtle overlay to fade edges and emphasize motion */
+  /* box-shadow: inset 50px 0 30px -30px var(--white-color), inset -50px 0 30px -30px var(--white-color); */
+}
+
+.slider-container {
+  position: relative;
+  padding: 0 5%;
+  overflow: hidden; /* Crucial: Hides content outside the slider view */
+}
+
+/* 1. Base Track for infinite loop */
+.slider-track {
+  display: flex;
+  /* Important: Disable scroll and snap behavior */
+  overflow-x: hidden;
+  scroll-snap-type: none;
+  scrollbar-width: none;
+  padding-bottom: 0;
+
+  /* Set the initial animation property */
+  animation: continuousSlide 45s linear infinite;
+  /* Pause animation on hover */
+  animation-play-state: running;
+
+  /* Calculate the total width of the doubled mock data (16 items * 300px item width) + 16 items * 20px gap */
+  /* 16 * 300 = 4800; 16 * 20 = 320. Total width must be greater than this for smooth loop */
+  width: 5500px; /* Set a fixed, large width that is DOUBLE the visible product content */
+}
+
+/* Pause on hover for interaction */
+.slider-container:hover .slider-track {
+  animation-play-state: paused;
+}
+
+.slider-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* 2. Item width adjusted for 20px gap */
+.slider-item {
+  flex: 0 0 300px;
+  min-width: 300px;
+  padding-right: 20px;
+  scroll-snap-align: none;
+}
+
+/* 3. Keyframes for continuous translation */
+@keyframes continuousSlide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Translate left by half the track's total width (the width of the first set of duplicated items) */
+    /* To create a seamless loop, the end point must match the start point of the duplicated content */
+    transform: translateX(
+      -2750px
+    ); /* Approximately half of 5500px, or the width of 8 items + gaps */
+  }
+}
+
+/* Navigation Buttons (Now disabled/decorative) */
+.slider-nav-btn {
+  opacity: 0.5; /* Visually indicate that buttons are disabled */
+  pointer-events: none; /* Prevent clicks */
+  /* ... (rest of existing button styles) ... */
+}
+
+/* ... (existing responsive styles) ... */
+
+@media (max-width: 768px) {
+  /* Adjust width calculation for mobile 80% width + 20px gap */
+  .slider-track {
+    width: 3200px; /* Smaller estimated width for mobile responsiveness */
+    animation: continuousSlideMobile 45s linear infinite;
+  }
+  .slider-item {
+    flex: 0 0 80vw; /* Use viewport width for better responsive sizing */
+    min-width: 80vw;
+    padding-right: 20px;
+  }
+
+  /* Redefine keyframes for mobile width */
+  @keyframes continuousSlideMobile {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      /* Translate by the width of the first set of duplicated mobile items */
+      transform: translateX(-1600px); /* Estimate based on 8 items * 80vw */
+    }
+  }
+
+  /* Hide buttons on mobile */
+  .slider-nav-btn {
+    display: none;
+  }
+}

@@ -1,47 +1,87 @@
 import React, { useState } from "react";
 import ProductCard from "../../components/common/ProductCard";
 
-// --- MOCK DATA FOR SHOP PAGE ---
+// --- MOCK DATA AUGMENTED with filterable properties (including numericPrice) ---
 const initialProducts = [
   {
     name: "Zynvert 12V 100Ah LiFePO4 Battery",
     price: "₹15,999",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=Zynvert+100Ah",
+    numericPrice: 15999,
+    category: "Lithium & LiFePO4 Batteries",
+    brand: "Zynvert",
+    voltage: "12V",
   },
   {
     name: "Solar Integrated Inverter 3kW",
     price: "₹45,500",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=Solar+Inverter",
+    numericPrice: 45500,
+    category: "Inverters & Solar",
+    brand: "Victron",
+    voltage: "48V",
   },
   {
     name: "4S 100A BMS with Active Balancer",
     price: "₹2,499",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=4S+BMS",
+    numericPrice: 2499,
+    category: "BMS & Protection Boards",
+    brand: "Daly",
+    voltage: "12V",
   },
   {
     name: "High-Current DC Wires (10 Mtr)",
     price: "₹899",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=DC+Wires",
+    numericPrice: 899,
+    category: "Wires & Connectors",
+    brand: "Zynvert",
+    voltage: "N/A",
   },
   {
     name: "12V 50Ah Li-ion Pack (Lightweight)",
     price: "₹9,500",
-    image: "https://placehold.co/400x400/FF6B6B/ffffff?text=50Ah+Li-ion",
+    numericPrice: 9500,
+    category: "Battery Packs",
+    brand: "Zynvert",
+    voltage: "12V",
   },
   {
     name: "20A PWM Solar Charge Controller",
     price: "₹1,250",
-    image: "https://placehold.co/400x400/4ECDC4/ffffff?text=PWM+Controller",
+    numericPrice: 1250,
+    category: "Chargers & Power Supplies",
+    brand: "Other Brands",
+    voltage: "24V",
   },
   {
     name: "Battery Cell Holder (Pack of 50)",
     price: "₹350",
-    image: "https://placehold.co/400x400/3A3A3A/ffffff?text=Holders",
+    numericPrice: 350,
+    category: "Raw Cells & Holders",
+    brand: "Other Brands",
+    voltage: "N/A",
   },
   {
     name: "Pure Sine Wave Inverter 1kW",
     price: "₹12,000",
-    image: "https://placehold.co/400x400/FF6B6B/ffffff?text=1kW+Inverter",
+    numericPrice: 12000,
+    category: "Inverters & Solar",
+    brand: "Other Brands",
+    voltage: "24V",
+  },
+  {
+    name: "JBD Active Balancer BMS 8S",
+    price: "₹5,200",
+    numericPrice: 5200,
+    category: "BMS & Protection Boards",
+    brand: "JBD",
+    voltage: "24V",
+  },
+  {
+    name: "3kW Integrated Power System",
+    price: "₹95,000",
+    numericPrice: 95000,
+    category: "Inverters & Solar",
+    brand: "Zynvert",
+    voltage: "48V",
   },
 ];
 
@@ -54,10 +94,9 @@ const mockFilters = {
     "Wires & Connectors",
     "Chargers & Power Supplies",
     "Raw Cells & Holders",
-    "Tools & Accessories",
   ],
   brand: ["Zynvert", "Daly", "JBD", "Victron", "Other Brands"],
-  voltage: ["12V", "24V", "48V"],
+  voltage: ["12V", "24V", "48V", "N/A"],
   price: [
     "Under ₹1,000",
     "₹1,000 - ₹5,000",
@@ -66,20 +105,95 @@ const mockFilters = {
   ],
 };
 
-// --- SHOP PAGE COMPONENT ---
-const ShopPage = () => {
-  const [products, setProducts] = useState(initialProducts);
+// --- NEW HELPER FUNCTION FOR PRICE FILTERING ---
+const checkPriceMatch = (productPrice, selectedRanges) => {
+  // If no price filters are selected, it is considered a match
+  if (!selectedRanges || selectedRanges.length === 0) {
+    return true;
+  }
 
-  // Placeholder for filter logic
+  const price = productPrice;
+
+  // Check if the product price matches at least one selected range (OR logic)
+  return selectedRanges.some((range) => {
+    if (range.includes("Under")) {
+      // e.g., "Under ₹1,000" -> checks if price < 1000
+      const maxPrice = 1000;
+      return price < maxPrice;
+    } else if (range.includes("Over")) {
+      // e.g., "Over ₹20,000" -> checks if price > 20000
+      const minPrice = 20000;
+      return price > minPrice;
+    } else {
+      // e.g., "₹1,000 - ₹5,000"
+      const parts = range.split(" - ");
+      // Safely extract numeric parts, removing currency symbols and commas
+      const minPrice = parseInt(parts[0].replace(/[^0-9]/g, ""), 10);
+      const maxPrice = parseInt(parts[1].replace(/[^0-9]/g, ""), 10);
+      return price >= minPrice && price <= maxPrice;
+    }
+  });
+};
+
+// --- SHOP PAGE COMPONENT with Filtering Logic ---
+const ShopPage = () => {
+  const [displayedProducts, setDisplayedProducts] = useState(initialProducts);
+  const [selectedFilters, setSelectedFilters] = useState({});
+
   const toggleFilter = (group, value) => {
-    console.log(`Filter toggled: ${group}: ${value}`);
+    setSelectedFilters((prevFilters) => {
+      const currentValues = prevFilters[group] || [];
+      const isSelected = currentValues.includes(value);
+
+      let newValues;
+      if (isSelected) {
+        newValues = currentValues.filter((v) => v !== value);
+      } else {
+        newValues = [...currentValues, value];
+      }
+
+      if (newValues.length === 0) {
+        const { [group]: _, ...rest } = prevFilters;
+        return rest;
+      }
+
+      return { ...prevFilters, [group]: newValues };
+    });
+  };
+
+  const applyFilters = () => {
+    const activeFilterGroups = Object.keys(selectedFilters);
+
+    if (activeFilterGroups.length === 0) {
+      setDisplayedProducts(initialProducts);
+      return;
+    }
+
+    const filtered = initialProducts.filter((product) => {
+      // Product must pass ALL active filter groups (AND logic between groups).
+      return activeFilterGroups.every((group) => {
+        const filterValues = selectedFilters[group];
+
+        // --- Price Filtering Logic FIX ---
+        if (group === "price") {
+          // Use the dedicated helper function for complex price range check
+          return checkPriceMatch(product.numericPrice, filterValues);
+        }
+
+        // --- General Filtering (Category, Brand, Voltage) (OR logic within a group) ---
+        const productValue = product[group];
+        // Check if the product's property value is included in the selected filter values.
+        return filterValues.includes(productValue);
+      });
+    });
+
+    setDisplayedProducts(filtered);
   };
 
   return (
     <div className="shop-page page-section section-reveal visible">
       <h1 className="shop-title">All Products</h1>
       <div className="shop-layout">
-        {/* Filter Sidebar (Sticky on Desktop) */}
         <aside className="filter-sidebar">
           <h2>Filter</h2>
 
@@ -88,10 +202,13 @@ const ShopPage = () => {
               <h4>{group.charAt(0).toUpperCase() + group.slice(1)}</h4>
               <ul className="filter-list">
                 {options.map((option) => (
-                  <li key={option}>
+                  <li key={group + option}>
                     <label>
                       <input
                         type="checkbox"
+                        checked={
+                          selectedFilters[group]?.includes(option) || false
+                        }
                         onChange={() => toggleFilter(group, option)}
                       />
                       {option}
@@ -102,13 +219,17 @@ const ShopPage = () => {
             </div>
           ))}
 
-          <button className="apply-filter-btn">Apply Filters</button>
+          <button className="apply-filter-btn" onClick={applyFilters}>
+            Apply Filters
+          </button>
         </aside>
 
         {/* Product Listing Area */}
         <div className="product-listing-area">
           <div className="sort-bar">
-            <p className="product-count">{products.length} Products Found</p>
+            <p className="product-count">
+              {displayedProducts.length} Products Found
+            </p>
             <select className="sort-dropdown">
               <option>Sort by: Best Match</option>
               <option>Sort by: Price: Low to High</option>
@@ -118,10 +239,24 @@ const ShopPage = () => {
           </div>
 
           <div className="product-grid shop-grid">
-            {products.map((product) => (
-              <ProductCard key={product.name} product={product} />
+            {displayedProducts.map((product, index) => (
+              <ProductCard key={index} product={product} />
             ))}
           </div>
+
+          {displayedProducts.length === 0 && (
+            <p
+              style={{
+                textAlign: "center",
+                marginTop: "50px",
+                fontSize: "1.2rem",
+                color: "#666",
+              }}
+            >
+              No products match your current filters. Try a different
+              combination!
+            </p>
+          )}
         </div>
       </div>
     </div>
