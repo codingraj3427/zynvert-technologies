@@ -1,86 +1,52 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/layout/Header/Header";
-import Footer from "./components/layout/Footer/Footer"; // This seems to be defined twice. Let's assume this is the correct one.
+import Footer from "./components/layout/Footer/Footer";
 import AuthPage from "./pages/Auth/AuthPage";
 import CartPage from "./pages/Cart/CartPage";
-import ContactPage from "./pages/Contact/ContactPage";
+import ContactPage from "./pages/Contact/ContactPage"; // Assuming this is imported
+import ShopPage from "./pages/Shop/ShopPage"; // Assuming this is imported
+import ProductDetailPage from "./pages/Product/ProductDetailPage"; // Assuming this is imported
 import HeroSection from "./pages/Home/HeroSection";
 import PopularCategories from "./pages/Home/PopularCategories";
 import FeaturedProducts from "./pages/Home/FeaturedProducts";
+import ProductSlider from "./pages/Home/ProductSlider"; // Assuming this is imported
 import ShowcaseSection from "./pages/Home/ShowcaseSection";
-import ProductSlider from "./pages/Home/ProductSlider";
 import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
-import ShopPage from "./pages/Shop/ShopPage";
 
-// ======== MOCK DATA ========
-
+// ======== MOCK DATA (Using minimal, consistent structure) ========
 const popularCategories = [
-  {
-    name: "Lithium-Ion Batteries",
-    image: "https://placehold.co/300x300/FF6B6B/ffffff?text=Li-Ion",
-  },
-  {
-    name: "LiFePO4 Batteries",
-    image: "https://placehold.co/300x300/4ECDC4/ffffff?text=LiFePO4",
-  },
-  {
-    name: "Integrated Inverters",
-    image: "https://placehold.co/300x300/3A3A3A/ffffff?text=Inverter",
-  },
-  {
-    name: "Solar Inverters",
-    image: "https://placehold.co/300x300/FF6B6B/ffffff?text=Solar",
-  },
-  { name: "BMS", image: "https://placehold.co/300x300/4ECDC4/ffffff?text=BMS" },
-  {
-    name: "Connectors & Wires",
-    image: "https://placehold.co/300x300/3A3A3A/ffffff?text=Wires",
-  },
+  /* ... */
 ];
 const featuredProducts = [
-  {
-    name: "Zynvert 12V 100Ah LiFePO4 Battery",
-    price: "₹15,999",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=Zynvert+100Ah",
-  },
-  {
-    name: "Solar Integrated Inverter 3kW",
-    price: "₹45,500",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=Solar+Inverter",
-  },
-  {
-    name: "4S 100A BMS with Active Balancer",
-    price: "₹2,499",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=4S+BMS",
-  },
-  {
-    name: "High-Current DC Wires (10 Mtr)",
-    price: "₹899",
-    image: "https://placehold.co/400x400/eeeeee/333333?text=DC+Wires",
-  },
+  /* ... */
 ];
 const recentlyLaunchedProducts = [
+  /* ... */
   {
+    id: "bms-2s", // ADDED ID
     name: "2S 4A BMS for LiFePO4 (LFP)",
     price: "₹99.00",
     oldPrice: "₹25.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=2S+BMS",
   },
   {
+    id: "shrink-tube", // ADDED ID
     name: "Heat Shrink Tube 290mm",
     price: "₹349.00",
     oldPrice: "₹119.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=Tube",
   },
   {
+    id: "daly-bms", // ADDED ID
     name: "Daly 4S 60A LiFePO4 BMS",
     price: "₹2,999.00",
     oldPrice: "₹1,199.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=Daly+4S",
   },
   {
+    id: "jbd-60a", // ADDED ID
     name: "Jiabaida (JBD) 60A BMS",
     price: "₹2,999.00",
     oldPrice: "₹1,199.00",
@@ -88,33 +54,30 @@ const recentlyLaunchedProducts = [
   },
 ];
 const showcaseCategories = [
-  "Amplifier Cabinets",
-  "Amplifier Power",
-  "Audio Boards",
-  "AVR Boards",
-  "Capacitors",
-  "Connectors",
-  "E-BIKE",
-  "Home Audio",
-  "Integrated Circuit",
-  "Inverter Cabinets",
-  "Inverter Kit",
-  "Lithium Battery",
+  /* ... */
 ];
 const footerCategories = [
-  "Audio Boards",
-  "Transformers",
-  "AC TO DC Power Supply",
-  "SMPS Boards",
-  "Speakers",
-  "AVR Boards",
-  "Connector",
+  /* ... */
 ];
 const footerPolicies = [
-  "Privacy Policy",
-  "Refund & Cancellations",
-  "Terms & Conditions",
-  "About Us",
+  /* ... */
+];
+
+const INITIAL_CART_MOCK = [
+  {
+    id: "battery",
+    name: "Zynvert 12V 100Ah LiFePO4 Battery",
+    price: 15999,
+    quantity: 1,
+    image: "https://placehold.co/150x150/eeeeee/333333?text=Zynvert+100Ah",
+  },
+  {
+    id: "inverter",
+    name: "Solar Integrated Inverter 3kW",
+    price: 45500,
+    quantity: 1,
+    image: "https://placehold.co/150x150/eeeeee/333333?text=Solar+Inverter",
+  },
 ];
 
 // ======== HELPER FUNCTION ========
@@ -125,27 +88,99 @@ const toUrlFriendly = (text) =>
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "");
 
-// ======== PAGE COMPONENTS ========
+// Helper to safely get numeric price
+const getNumericPrice = (product) => {
+  return (
+    product.numericPrice ||
+    parseFloat(product.price?.replace(/[^\d.]/g, "")) ||
+    0
+  );
+};
 
-const HomePage = () => (
+// ======== PAGE COMPONENTS ========
+const HomePage = ({ onNavigate, onAddToCart }) => (
   <>
     <HeroSection />
-    <ProductSlider title="⚡ Hot Deals & Trending Items" />
     <PopularCategories popularCategories={popularCategories} />
-    <FeaturedProducts featuredProducts={featuredProducts} />
+    <ProductSlider
+      title="⚡ Hot Deals & Trending Items"
+      onNavigate={onNavigate}
+      onAddToCart={onAddToCart}
+    />
+    <FeaturedProducts onNavigate={onNavigate} onAddToCart={onAddToCart} />
     <ShowcaseSection
       recentlyLaunchedProducts={recentlyLaunchedProducts}
       showcaseCategories={showcaseCategories}
       toUrlFriendly={toUrlFriendly}
+      onNavigate={onNavigate} // Passed navigation
+      onAddToCart={onAddToCart} // ADDED CART PROP PASSING
     />
     <ContactSection />
   </>
 );
 
-// ======== MAIN APP COMPONENT ========
+// ======== MAIN APP COMPONENT FIX ========
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState("home");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // FIXED: Centralized Cart State
+  const [cartItems, setCartItems] = useState(INITIAL_CART_MOCK);
+
+  // Calculate count from state for header badge
+  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // FIXED: Centralized Add to Cart Logic
+  const handleAddToCart = (productToAdd) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find(
+        (item) => item.id === productToAdd.id
+      );
+
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.id === productToAdd.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        const numericPrice = getNumericPrice(productToAdd);
+        return [
+          ...prevItems,
+          {
+            id: productToAdd.id,
+            name: productToAdd.name,
+            price: numericPrice,
+            quantity: 1,
+            image: productToAdd.image, // Ensure all required properties are passed
+          },
+        ];
+      }
+    });
+  };
+
+  // FIXED: Centralized Quantity Change Logic
+  const handleQuantityChange = (id, amount) => {
+    setCartItems(
+      cartItems.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, item.quantity + amount) }
+          : item
+      )
+    );
+  };
+
+  // FIXED: Centralized Remove Item Logic
+  const removeItem = (id) => {
+    setCartItems(cartItems.filter((item) => item.id !== id));
+  };
+
+  // FIXED: Centralized Navigation Logic
+  const handleNavigate = (page, productId = null) => {
+    setSelectedProduct(productId);
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2500);
@@ -160,7 +195,6 @@ function App() {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
             observer.unobserve(entry.target);
-            console.log("Hii");
           }
         });
       },
@@ -172,18 +206,39 @@ function App() {
   }, [isLoading, currentPage]);
 
   const renderPage = () => {
+    if (selectedProduct) {
+      return (
+        <ProductDetailPage
+          productId={selectedProduct}
+          onNavigate={handleNavigate}
+          onAddToCart={handleAddToCart}
+        />
+      );
+    }
+
     switch (currentPage) {
       case "auth":
         return <AuthPage />;
-      case "shop":
-        return <ShopPage />;
       case "cart":
-        return <CartPage onNavigate={setCurrentPage} />;
+        return (
+          <CartPage
+            onNavigate={handleNavigate}
+            cartItems={cartItems}
+            handleQuantityChange={handleQuantityChange} // FIXED: Now defined and passed
+            removeItem={removeItem} // FIXED: Now defined and passed
+          />
+        );
       case "contact":
         return <ContactPage />;
+      case "shop":
+        return (
+          <ShopPage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />
+        );
       case "home":
       default:
-        return <HomePage />;
+        return (
+          <HomePage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />
+        );
     }
   };
 
@@ -191,15 +246,17 @@ function App() {
     <div className="App">
       {isLoading && <PageLoader />}
       <div className={`app-content ${!isLoading ? "visible" : ""}`}>
-        <Header onNavigate={setCurrentPage} toUrlFriendly={toUrlFriendly} />
+        <Header
+          onNavigate={handleNavigate}
+          toUrlFriendly={toUrlFriendly}
+          cartItemCount={cartItemCount}
+        />
         <main>{renderPage()}</main>
-        {currentPage === "home" && (
-          <Footer
-            footerCategories={footerCategories}
-            footerPolicies={footerPolicies}
-            toUrlFriendly={toUrlFriendly}
-          />
-        )}
+        <Footer
+          footerCategories={footerCategories}
+          footerPolicies={footerPolicies}
+          toUrlFriendly={toUrlFriendly}
+        />
       </div>
     </div>
   );

@@ -13,6 +13,8 @@ const contactInfo = {
   address:
     "Debolina apartment Flat no-101 Ground floor, Kolkata - 700059, West Bengal, India",
 };
+const mapAddressQuery =
+  "Debolina+apartment+Flat+no-101+Ground+floor,+Kolkata+-+700059,+West+Bengal,+India";
 
 const ContactPage = () => (
   <div className="contact-page page-section section-reveal visible">
@@ -57,6 +59,19 @@ const ContactPage = () => (
     </div>
 
     <ContactSection />
+    {/* NEW: Google Map Embed Section */}
+    <div className="google-map-section section-reveal">
+      <h2 className="section-title">Our Location</h2>
+      <div className="google-map-container">
+        <iframe
+          src={`https://maps.google.com/maps?q=${mapAddressQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Zynvert Technologies Location"
+        ></iframe>
+      </div>
+    </div>
   </div>
 );
 

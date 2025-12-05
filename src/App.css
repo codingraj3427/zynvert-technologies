@@ -1601,8 +1601,15 @@ a {
   background-color: var(--light-grey);
   border-radius: var(--border-radius);
   position: sticky;
-  top: 150px; /* Offset below header for sticky effect */
-  align-self: flex-start; /* Keeps the sidebar contained */
+
+  /* 1. Adjusted offset for reliable sticking right under the header */
+  top: 100px;
+  align-self: flex-start;
+
+  /* 2. Constrain height to viewport minus header, making internal content scrollable */
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+
   min-height: 500px;
 }
 
@@ -1860,5 +1867,315 @@ a {
   /* Hide buttons on mobile */
   .slider-nav-btn {
     display: none;
+  }
+}
+
+/* ------------------------------------------- */
+/* ======== NEW: Product Detail Page Styles ======== */
+/* ------------------------------------------- */
+
+.product-detail-page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 5%;
+}
+
+.product-header-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 50px;
+  margin-bottom: 50px;
+  align-items: flex-start;
+}
+
+/* Image Gallery */
+.image-gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.main-product-image {
+  width: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 1px solid #eee;
+}
+
+.thumbnail-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.thumbnail-image:hover {
+  border-color: var(--primary-color);
+}
+
+/* Details & Controls */
+.product-title {
+  font-size: 2rem;
+  color: var(--secondary-color);
+  margin-bottom: 5px;
+}
+
+.product-tagline {
+  color: #666;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.product-rating {
+  margin-bottom: 20px;
+}
+
+.product-rating .stars {
+  font-size: 1.2rem;
+  color: gold;
+}
+
+.review-count {
+  font-size: 0.9rem;
+  color: #999;
+  margin-left: 10px;
+}
+
+.price-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 20px 0 10px;
+}
+
+.stock-status {
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.stock-status.in-stock {
+  color: var(--accent-color);
+}
+
+.stock-status.out-of-stock {
+  color: #ff6b6b;
+}
+
+.buying-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.buying-controls .quantity-selector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.buying-controls .quantity-selector button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  color: var(--secondary-color);
+}
+
+.buying-controls .quantity-selector input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-size: 1rem;
+  padding: 8px 0;
+}
+
+.buying-controls .add-to-cart-btn {
+  flex-grow: 1;
+  padding: 15px;
+  background: var(--secondary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.buying-controls .buy-now-btn {
+  flex-grow: 1;
+  padding: 15px;
+  background: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.trust-seals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 15px 0;
+  border-top: 1px dashed #eee;
+}
+
+.trust-item {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-weight: 500;
+}
+
+/* Tabs Section */
+.product-tabs-container {
+  border: 1px solid #eee;
+  border-radius: var(--border-radius);
+  padding-bottom: 30px;
+}
+
+.tabs-nav {
+  display: flex;
+  border-bottom: 2px solid var(--light-grey);
+  margin-bottom: 20px;
+}
+
+.tabs-nav .tab-button {
+  padding: 15px 25px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #666;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tabs-nav .tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.tabs-content {
+  padding: 0 25px;
+}
+
+.overview-list {
+  margin-left: 20px;
+  padding-left: 0;
+  list-style: square;
+}
+
+.specs-table {
+  padding: 10px 0;
+}
+
+.specs-group {
+  margin-bottom: 25px;
+}
+
+.specs-group h4 {
+  font-size: 1.2rem;
+  margin: 15px 0 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted #ddd;
+  color: var(--secondary-color);
+}
+
+.specs-table-content {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specs-table-content th,
+.specs-table-content td {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+}
+
+.specs-table-content th {
+  font-weight: 500;
+  width: 40%;
+  color: #555;
+}
+
+.specs-table-content tr:last-child th,
+.specs-table-content tr:last-child td {
+  border-bottom: none;
+}
+
+.doc-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.doc-list li a {
+  display: block;
+  padding: 10px 0;
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+.related-products-section {
+  padding-top: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .product-header-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+/* ======== NEW: Google Map Styles ======== */
+.google-map-section {
+  padding-top: 40px;
+}
+
+.google-map-container {
+  width: 100%;
+  /* Use padding-bottom trick for responsive aspect ratio (e.g., 50% = 2:1 ratio) */
+  padding-bottom: 40%;
+  height: 0;
+  position: relative;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.google-map-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Responsive adjustment for map on smaller screens */
+@media (max-width: 768px) {
+  .google-map-container {
+    /* Make the map taller on small screens */
+    padding-bottom: 75%;
   }
 }

@@ -1,6 +1,14 @@
+// src/pages/Home/ShowcaseSection.jsx
+
 import React from "react";
 
-const ShowcaseSection = ({ recentlyLaunchedProducts, showcaseCategories, toUrlFriendly }) => (
+const ShowcaseSection = ({
+  recentlyLaunchedProducts,
+  showcaseCategories,
+  toUrlFriendly,
+  onNavigate,
+  onAddToCart,
+}) => (
   <section className="page-section section-reveal">
     <h2 className="section-title">Recently Launched</h2>
     <div className="showcase-section">
@@ -18,17 +26,32 @@ const ShowcaseSection = ({ recentlyLaunchedProducts, showcaseCategories, toUrlFr
         </ul>
       </div>
       <div className="showcase-right">
-        <div className="showcase-product-grid" >
+        <div className="showcase-product-grid">
           {recentlyLaunchedProducts.map((product) => (
             <div key={product.name} className="showcase-product-card">
-              <img src={product.image} alt={product.name} />
-              <div className="showcase-product-info">
-                <p className="showcase-product-name">{product.name}</p>
-                <div className="showcase-product-pricing">
-                  <span className="current-price">{product.oldPrice}</span>
-                  <span className="old-price">{product.price}</span>
+              {/* Added Link Wrapper for Navigation */}
+              <div
+                className="showcase-link-wrapper"
+                onClick={() => onNavigate("product", product.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <img src={product.image} alt={product.name} />
+                <div className="showcase-product-info">
+                  <p className="showcase-product-name">{product.name}</p>
+                  <div className="showcase-product-pricing">
+                    <span className="current-price">{product.oldPrice}</span>
+                    <span className="old-price">{product.price}</span>
+                  </div>
                 </div>
               </div>
+
+              {/* Added functional Add to Cart button */}
+              <button
+                className="add-to-cart-btn showcase-atc-btn"
+                onClick={() => onAddToCart(product)}
+              >
+                Add to Cart
+              </button>
             </div>
           ))}
         </div>

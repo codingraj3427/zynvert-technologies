@@ -19,10 +19,10 @@ const navCategories = [
   { name: "Tools & Accessories" },
 ];
 
-const Header = ({ onNavigate, toUrlFriendly }) => {
+const Header = ({ onNavigate, toUrlFriendly, cartItemCount }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState(false); // NEW state to control search input
-  const [searchQuery, setSearchQuery] = useState(""); // NEW state for the search input value
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [placeholder, setPlaceholder] = useState("");
   const timeoutRef = useRef(null);
@@ -118,7 +118,14 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
           >
             Home
           </a>
-          <a href="#shop" className="mobile-nav-link">
+          <a
+            href="#shop"
+            onClick={() => {
+              onNavigate("shop");
+              setMobileMenuOpen(false);
+            }}
+            className="mobile-nav-link"
+          >
             Shop
           </a>
           <a href="#new" className="mobile-nav-link">
@@ -171,7 +178,7 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
             }}
             className="mobile-nav-link user-link"
           >
-            <CartIcon />
+            <CartIcon itemCount={cartItemCount} />
             <span>My Cart</span>
           </a>
         </nav>
@@ -209,7 +216,7 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
               onClick={() => onNavigate("cart")}
               className="action-item-mobile"
             >
-              <CartIcon />
+              <CartIcon itemCount={cartItemCount} />
             </a>
             <button
               className="hamburger-menu"
@@ -236,13 +243,12 @@ const Header = ({ onNavigate, toUrlFriendly }) => {
               onClick={() => onNavigate("cart")}
               className="action-item"
             >
-              <CartIcon />
+              <CartIcon itemCount={cartItemCount} />
               <span>My Cart</span>
             </a>
           </div>
         </div>
         <div className="mobile-search-container">
-          {/* FIX: Input is now interactive */}
           <input
             type="text"
             placeholder={placeholder}

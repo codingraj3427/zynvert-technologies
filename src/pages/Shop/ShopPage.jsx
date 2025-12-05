@@ -4,6 +4,7 @@ import ProductCard from "../../components/common/ProductCard";
 // --- MOCK DATA AUGMENTED with filterable properties (including numericPrice) ---
 const initialProducts = [
   {
+    id: "battery",
     name: "Zynvert 12V 100Ah LiFePO4 Battery",
     price: "₹15,999",
     numericPrice: 15999,
@@ -12,6 +13,7 @@ const initialProducts = [
     voltage: "12V",
   },
   {
+    id: "inverter",
     name: "Solar Integrated Inverter 3kW",
     price: "₹45,500",
     numericPrice: 45500,
@@ -20,6 +22,7 @@ const initialProducts = [
     voltage: "48V",
   },
   {
+    id: "bms",
     name: "4S 100A BMS with Active Balancer",
     price: "₹2,499",
     numericPrice: 2499,
@@ -28,6 +31,7 @@ const initialProducts = [
     voltage: "12V",
   },
   {
+    id: "wires",
     name: "High-Current DC Wires (10 Mtr)",
     price: "₹899",
     numericPrice: 899,
@@ -36,6 +40,7 @@ const initialProducts = [
     voltage: "N/A",
   },
   {
+    id: "liion",
     name: "12V 50Ah Li-ion Pack (Lightweight)",
     price: "₹9,500",
     numericPrice: 9500,
@@ -44,6 +49,7 @@ const initialProducts = [
     voltage: "12V",
   },
   {
+    id: "controller",
     name: "20A PWM Solar Charge Controller",
     price: "₹1,250",
     numericPrice: 1250,
@@ -52,6 +58,7 @@ const initialProducts = [
     voltage: "24V",
   },
   {
+    id: "holder",
     name: "Battery Cell Holder (Pack of 50)",
     price: "₹350",
     numericPrice: 350,
@@ -60,6 +67,7 @@ const initialProducts = [
     voltage: "N/A",
   },
   {
+    id: "inverter2",
     name: "Pure Sine Wave Inverter 1kW",
     price: "₹12,000",
     numericPrice: 12000,
@@ -68,6 +76,7 @@ const initialProducts = [
     voltage: "24V",
   },
   {
+    id: "jbd-bms",
     name: "JBD Active Balancer BMS 8S",
     price: "₹5,200",
     numericPrice: 5200,
@@ -76,6 +85,7 @@ const initialProducts = [
     voltage: "24V",
   },
   {
+    id: "power-system",
     name: "3kW Integrated Power System",
     price: "₹95,000",
     numericPrice: 95000,
@@ -105,29 +115,23 @@ const mockFilters = {
   ],
 };
 
-// --- NEW HELPER FUNCTION FOR PRICE FILTERING ---
+// --- HELPER FUNCTION FOR PRICE FILTERING ---
 const checkPriceMatch = (productPrice, selectedRanges) => {
-  // If no price filters are selected, it is considered a match
   if (!selectedRanges || selectedRanges.length === 0) {
     return true;
   }
 
   const price = productPrice;
 
-  // Check if the product price matches at least one selected range (OR logic)
   return selectedRanges.some((range) => {
     if (range.includes("Under")) {
-      // e.g., "Under ₹1,000" -> checks if price < 1000
       const maxPrice = 1000;
       return price < maxPrice;
     } else if (range.includes("Over")) {
-      // e.g., "Over ₹20,000" -> checks if price > 20000
       const minPrice = 20000;
       return price > minPrice;
     } else {
-      // e.g., "₹1,000 - ₹5,000"
       const parts = range.split(" - ");
-      // Safely extract numeric parts, removing currency symbols and commas
       const minPrice = parseInt(parts[0].replace(/[^0-9]/g, ""), 10);
       const maxPrice = parseInt(parts[1].replace(/[^0-9]/g, ""), 10);
       return price >= minPrice && price <= maxPrice;
@@ -136,7 +140,7 @@ const checkPriceMatch = (productPrice, selectedRanges) => {
 };
 
 // --- SHOP PAGE COMPONENT with Filtering Logic ---
-const ShopPage = () => {
+const ShopPage = ({ onNavigate, onAddToCart }) => {
   const [displayedProducts, setDisplayedProducts] = useState(initialProducts);
   const [selectedFilters, setSelectedFilters] = useState({});
 
@@ -174,13 +178,10 @@ const ShopPage = () => {
       return activeFilterGroups.every((group) => {
         const filterValues = selectedFilters[group];
 
-        // --- Price Filtering Logic FIX ---
         if (group === "price") {
-          // Use the dedicated helper function for complex price range check
           return checkPriceMatch(product.numericPrice, filterValues);
         }
 
-        // --- General Filtering (Category, Brand, Voltage) (OR logic within a group) ---
         const productValue = product[group];
         // Check if the product's property value is included in the selected filter values.
         return filterValues.includes(productValue);
@@ -194,6 +195,7 @@ const ShopPage = () => {
     <div className="shop-page page-section section-reveal visible">
       <h1 className="shop-title">All Products</h1>
       <div className="shop-layout">
+        {/* Filter Sidebar (Sticky on Desktop) */}
         <aside className="filter-sidebar">
           <h2>Filter</h2>
 
@@ -219,6 +221,7 @@ const ShopPage = () => {
             </div>
           ))}
 
+          {/* This button now triggers the filtering logic */}
           <button className="apply-filter-btn" onClick={applyFilters}>
             Apply Filters
           </button>
@@ -240,7 +243,13 @@ const ShopPage = () => {
 
           <div className="product-grid shop-grid">
             {displayedProducts.map((product, index) => (
-              <ProductCard key={index} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                productId={product.id}
+                onNavigate={onNavigate}
+                onAddToCart={onAddToCart}
+              />
             ))}
           </div>
 
