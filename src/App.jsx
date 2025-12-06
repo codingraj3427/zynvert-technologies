@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
+// 1. Redux Imports
+import { useDispatch, useSelector } from 'react-redux';
+import { loginSuccess, logoutUser, setLoading as setAuthLoading } from './store/authSlice';
+// 2. Firebase Import (Assumption: You have a firebase config file)
+import { auth } from './config/firebase'; 
+import { onAuthStateChanged } from 'firebase/auth';
+
 import "./App.css";
 import Header from "./components/layout/Header/Header";
 import Footer from "./components/layout/Footer/Footer";
 import AuthPage from "./pages/Auth/AuthPage";
 import CartPage from "./pages/Cart/CartPage";
-import ContactPage from "./pages/Contact/ContactPage"; // Assuming this is imported
-import ShopPage from "./pages/Shop/ShopPage"; // Assuming this is imported
-import ProductDetailPage from "./pages/Product/ProductDetailPage"; // Assuming this is imported
+import ContactPage from "./pages/Contact/ContactPage"; 
+import ShopPage from "./pages/Shop/ShopPage"; 
+import ProductDetailPage from "./pages/Product/ProductDetailPage"; 
 import HeroSection from "./pages/Home/HeroSection";
 import PopularCategories from "./pages/Home/PopularCategories";
 import FeaturedProducts from "./pages/Home/FeaturedProducts";
-import ProductSlider from "./pages/Home/ProductSlider"; // Assuming this is imported
+import ProductSlider from "./pages/Home/ProductSlider"; 
 import ShowcaseSection from "./pages/Home/ShowcaseSection";
 import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
+import AccountPage from "./pages/Account/AccountPage";
 
-// ======== MOCK DATA (Using minimal, consistent structure) ========
+// ======== MOCK DATA (omitted for brevity) ========
 const popularCategories = [
   /* ... */
 ];
@@ -24,28 +32,28 @@ const popularCategories = [
 const recentlyLaunchedProducts = [
   /* ... */
   {
-    id: "bms-2s", // ADDED ID
+    id: "bms-2s", 
     name: "2S 4A BMS for LiFePO4 (LFP)",
     price: "₹99.00",
     oldPrice: "₹25.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=2S+BMS",
   },
   {
-    id: "shrink-tube", // ADDED ID
+    id: "shrink-tube", 
     name: "Heat Shrink Tube 290mm",
     price: "₹349.00",
     oldPrice: "₹119.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=Tube",
   },
   {
-    id: "daly-bms", // ADDED ID
+    id: "daly-bms", 
     name: "Daly 4S 60A LiFePO4 BMS",
     price: "₹2,999.00",
     oldPrice: "₹1,199.00",
     image: "https://placehold.co/200x200/eeeeee/333?text=Daly+4S",
   },
   {
-    id: "jbd-60a", // ADDED ID
+    id: "jbd-60a", 
     name: "Jiabaida (JBD) 60A BMS",
     price: "₹2,999.00",
     oldPrice: "₹1,199.00",
@@ -79,7 +87,7 @@ const INITIAL_CART_MOCK = [
   },
 ];
 
-// ======== HELPER FUNCTION ========
+// ======== HELPER FUNCTION (omitted for brevity) ========
 const toUrlFriendly = (text) =>
   text
     .toLowerCase()
@@ -87,7 +95,6 @@ const toUrlFriendly = (text) =>
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "");
 
-// Helper to safely get numeric price
 const getNumericPrice = (product) => {
   return (
     product.numericPrice ||
@@ -96,7 +103,7 @@ const getNumericPrice = (product) => {
   );
 };
 
-// ======== PAGE COMPONENTS ========
+// ======== PAGE COMPONENTS (omitted for brevity) ========
 const HomePage = ({ onNavigate, onAddToCart }) => (
   <>
     <HeroSection />
@@ -111,8 +118,8 @@ const HomePage = ({ onNavigate, onAddToCart }) => (
       recentlyLaunchedProducts={recentlyLaunchedProducts}
       showcaseCategories={showcaseCategories}
       toUrlFriendly={toUrlFriendly}
-      onNavigate={onNavigate} // Passed navigation
-      onAddToCart={onAddToCart} // ADDED CART PROP PASSING
+      onNavigate={onNavigate} 
+      onAddToCart={onAddToCart} 
     />
     <ContactSection />
   </>
@@ -120,23 +127,22 @@ const HomePage = ({ onNavigate, onAddToCart }) => (
 
 // ======== MAIN APP COMPONENT FIX ========
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [appIsLoading, setAppIsLoading] = useState(true); 
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // FIXED: Centralized Cart State
-  const [cartItems, setCartItems] = useState(INITIAL_CART_MOCK);
+  const dispatch = useDispatch();
+  const { isAuthenticated, loading: authLoading } = useSelector(state => state.auth);
 
-  // Calculate count from state for header badge
+  const [cartItems, setCartItems] = useState(INITIAL_CART_MOCK);
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // FIXED: Centralized Add to Cart Logic
+  // ... (Cart and Navigation handlers omitted for brevity) ...
   const handleAddToCart = (productToAdd) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(
         (item) => item.id === productToAdd.id
       );
-
       if (existingItem) {
         return prevItems.map((item) =>
           item.id === productToAdd.id
@@ -152,14 +158,13 @@ function App() {
             name: productToAdd.name,
             price: numericPrice,
             quantity: 1,
-            image: productToAdd.image, // Ensure all required properties are passed
+            image: productToAdd.image, 
           },
         ];
       }
     });
   };
 
-  // FIXED: Centralized Quantity Change Logic
   const handleQuantityChange = (id, amount) => {
     setCartItems(
       cartItems.map((item) =>
@@ -170,39 +175,81 @@ function App() {
     );
   };
 
-  // FIXED: Centralized Remove Item Logic
   const removeItem = (id) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
   };
 
-  // FIXED: Centralized Navigation Logic
   const handleNavigate = (page, productId = null) => {
     setSelectedProduct(productId);
     setCurrentPage(page);
   };
-
+  
+  // State to simulate data loading time
+  const [dataLoaded, setDataLoaded] = useState(false);
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2500);
-    return () => clearTimeout(timer);
+    const loadData = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500)); 
+      setDataLoaded(true);
+    };
+    loadData();
   }, []);
 
+
+  // Auth Listener (omitted for brevity)
   useEffect(() => {
-    if (isLoading) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    const sections = document.querySelectorAll(".section-reveal");
-    sections.forEach((section) => observer.observe(section));
-    return () => sections.forEach((section) => observer.unobserve(section));
-  }, [isLoading, currentPage]);
+    dispatch(setAuthLoading(true)); 
+    
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        dispatch(loginSuccess(user));
+        if (currentPage === 'auth') {
+          handleNavigate('home'); 
+        }
+      } else {
+        dispatch(logoutUser());
+      }
+      dispatch(setAuthLoading(false));
+    });
+
+    return () => unsubscribe();
+  }, [dispatch, currentPage]);
+
+  // App Loading Screen Controller (omitted for brevity)
+  useEffect(() => {
+    if (!authLoading && dataLoaded) {
+      const timer = setTimeout(() => setAppIsLoading(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [authLoading, dataLoaded]); 
+
+  // Intersection Observer Logic (omitted for brevity)
+  useEffect(() => {
+    if (appIsLoading) return;
+    
+    const runObserver = setTimeout(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        
+        const sections = document.querySelectorAll(".section-reveal");
+        sections.forEach((section) => observer.observe(section));
+        
+        return () => observer.disconnect();
+    }, 50); 
+
+    return () => clearTimeout(runObserver);
+    
+  }, [appIsLoading, currentPage]); 
+  
+
 
   const renderPage = () => {
     if (selectedProduct) {
@@ -214,17 +261,23 @@ function App() {
         />
       );
     }
+    
+    if (isAuthenticated && currentPage === 'auth') {
+        return <HomePage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />;
+    }
 
     switch (currentPage) {
       case "auth":
-        return <AuthPage />;
+        return <AuthPage />; 
+      case "account":
+        return isAuthenticated ? <AccountPage onNavigate={handleNavigate} /> : <AuthPage />;
       case "cart":
         return (
           <CartPage
             onNavigate={handleNavigate}
             cartItems={cartItems}
-            handleQuantityChange={handleQuantityChange} // FIXED: Now defined and passed
-            removeItem={removeItem} // FIXED: Now defined and passed
+            handleQuantityChange={handleQuantityChange} 
+            removeItem={removeItem} 
           />
         );
       case "contact":
@@ -234,6 +287,8 @@ function App() {
           <ShopPage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />
         );
       case "home":
+      case "orders": 
+      case "favorites": 
       default:
         return (
           <HomePage onNavigate={handleNavigate} onAddToCart={handleAddToCart} />
@@ -241,20 +296,36 @@ function App() {
     }
   };
 
+  if (appIsLoading || authLoading || !dataLoaded) {
+    return <PageLoader />;
+  }
+
+
   return (
-    <div className="App">
-      {isLoading && <PageLoader />}
-      <div className={`app-content ${!isLoading ? "visible" : ""}`}>
+    <div className="App" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}> 
+      <div className={`app-content ${!appIsLoading ? "visible" : ""}`} 
+           style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        
         <Header
-          onNavigate={handleNavigate}
-          toUrlFriendly={toUrlFriendly}
-          cartItemCount={cartItemCount}
+            onNavigate={handleNavigate}
+            toUrlFriendly={toUrlFriendly}
+            cartItemCount={cartItemCount}
         />
-        <main>{renderPage()}</main>
+        
+        <main key={currentPage} style={{ 
+            flexGrow: -1, 
+            // ⭐️ FIX: Removed alignItems: 'center' to allow full width
+            display: currentPage === 'auth' ? 'flex' : 'initial',
+            justifyContent: currentPage === 'auth' ? 'center' : 'initial', // Keeps vertical center
+            padding: currentPage === 'auth' ? '20px' : 'initial' // Keep padding
+        }}>
+          {renderPage()}
+        </main>
+        
         <Footer
-          footerCategories={footerCategories}
-          footerPolicies={footerPolicies}
-          toUrlFriendly={toUrlFriendly}
+            footerCategories={footerCategories}
+            footerPolicies={footerPolicies}
+            toUrlFriendly={toUrlFriendly}
         />
       </div>
     </div>

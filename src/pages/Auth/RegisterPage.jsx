@@ -43,34 +43,45 @@ const RegisterPage = ({ onToggleView }) => {
       await authService.register(
         formData.firstName,
         formData.lastName,
-        formData.phone,
+        formData.phone, // <--- New field passed
         formData.email,
         formData.password
       );
 
-      // 3. Success Feedback
+      // 3. Success Feedback - App.js listener handles final redirect
       setMessage("Registration successful! Redirecting...");
       
-      // The App.js auth listener will detect the login and redirect, 
-      // but we can also trigger a view toggle if needed.
+      // Optional: Delay the toggle for a better user experience
       setTimeout(() => {
-        // Optional: onToggleView(); 
+        // You might decide to redirect fully, but keeping this simple.
+        // If App.js detects the auth change, it should handle the full redirect.
       }, 1500);
 
     } catch (err) {
       console.error("Registration failed:", err);
       // specific Firebase error handling could go here
-      setError("Registration failed: " + (err.message || "Unknown error"));
+      let errorMessage = "Registration failed: Unknown error.";
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = "The email address is already in use.";
+      } else if (err.message) {
+        errorMessage = "Registration failed: " + err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleSignup = async () => {
+    setError(null);
+    setLoading(true);
     try {
       await authService.loginWithGoogle();
     } catch (err) {
-      setError("Google Sign-Up failed: " + err.message);
+      console.error("Google Sign-Up failed:", err);
+      setError("Google Sign-Up failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,7 +104,7 @@ const RegisterPage = ({ onToggleView }) => {
       </div>
 
       <form className="auth-form" onSubmit={handleSignup}>
-        {/* Name Fields Row */}
+        {/* Name Fields Row - NOW REQUIRED */}
         <div style={{ display: 'flex', gap: '1rem' }}>
           <div className="form-group" style={{ flex: 1 }}>
             <label htmlFor="firstName">First Name</label>

@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+// 1. Redux & Service Imports
+import { useSelector, useDispatch } from 'react-redux'; 
+import { authService } from '../../../services/auth.service'; // <--- Service for logout
+import { logoutUser } from '../../../store/authSlice'; // <--- Action to update Redux
+
 import LogoIcon from "../../../assets/icons/LogoIcon";
 import CartIcon from "../../../assets/icons/CartIcon";
 import CloseIcon from "../../../assets/icons/CloseIcon";
@@ -24,6 +29,13 @@ const Header = ({ onNavigate, toUrlFriendly, cartItemCount }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const dispatch = useDispatch(); // <--- Initialize dispatch
+  // Get user data from Redux
+  const { isAuthenticated, user } = useSelector(state => state.auth);
+
+  // Determine user display name
+  const userDisplayName = user?.displayName || user?.email?.split('@')[0] || 'My Account';
+  
   const [placeholder, setPlaceholder] = useState("");
   const timeoutRef = useRef(null);
   const placeholderTexts = useRef([
@@ -35,6 +47,21 @@ const Header = ({ onNavigate, toUrlFriendly, cartItemCount }) => {
   const textIndex = useRef(0);
   const charIndex = useRef(0);
   const isDeleting = useRef(false);
+
+  // ⭐️ NEW: Logout Handler
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      dispatch(logoutUser());
+      // Navigate to home page after logout
+      onNavigate('home');
+      setMobileMenuOpen(false); // Close mobile menu if logout happened there
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Handle logout error (e.g., show notification)
+    }
+  };
+
 
   // FIX: This useEffect now depends on isMobileMenuOpen AND isSearching
   useEffect(() => {
@@ -157,16 +184,39 @@ const Header = ({ onNavigate, toUrlFriendly, cartItemCount }) => {
           ))}
           <hr />
           <h4 className="mobile-nav-title">My Account</h4>
-          <a
-            href="#auth"
-            onClick={() => {
-              onNavigate("auth");
-              setMobileMenuOpen(false);
-            }}
-            className="mobile-nav-link user-link"
-          >
-            <UserIcon /> Sign In
-          </a>
+          {isAuthenticated ? (
+            <>
+              <a
+                href="#profile"
+                onClick={() => {
+                  onNavigate("account"); // Navigating to account page
+                  setMobileMenuOpen(false);
+                }}
+                className="mobile-nav-link user-link"
+              >
+                <UserIcon /> Hello, {userDisplayName}!
+              </a>
+              {/* ⭐️ NEW: Mobile Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="mobile-nav-link user-link"
+                style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', textAlign: 'left', padding: '10px 15px' }}
+              >
+                <i className="fas fa-sign-out-alt"></i> Sign Out
+              </button>
+            </>
+          ) : (
+            <a
+              href="#auth"
+              onClick={() => {
+                onNavigate("auth");
+                setMobileMenuOpen(false);
+              }}
+              className="mobile-nav-link user-link"
+            >
+              <UserIcon /> Sign In
+            </a>
+          )}
           <a href="#favorites" className="mobile-nav-link user-link">
             <HeartIcon /> Favorites
           </a>
@@ -226,14 +276,45 @@ const Header = ({ onNavigate, toUrlFriendly, cartItemCount }) => {
             </button>
           </div>
           <div className="user-actions">
-            <a
-              href="#auth"
-              onClick={() => onNavigate("auth")}
-              className="action-item"
-            >
-              <UserIcon />
-              <span>Sign In</span>
-            </a>
+            {isAuthenticated ? (
+              // ⭐️ NEW: User Name and Logout Button container
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <a
+                  href="#profile"
+                  onClick={() => onNavigate('account')} // Navigating to account page
+                  className="action-item"
+                >
+                  <UserIcon />
+                  <span>Hello, {userDisplayName}</span>
+                </a>
+                <button 
+                  onClick={handleLogout} 
+                  className="action-item" 
+                  style={{ 
+                    // Add minimal styling to make it look like a button
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-color)', 
+                    padding: 0, 
+                    display: 'flex', 
+                    alignItems: 'center' 
+                  }}
+                >
+                  <i className="fas fa-sign-out-alt"></i> {/* Assuming you have Font Awesome or similar for icons */}
+                  <span style={{ marginLeft: '5px' }}>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <a
+                href="#auth"
+                onClick={() => onNavigate("auth")}
+                className="action-item"
+              >
+                <UserIcon />
+                <span>Sign In</span>
+              </a>
+            )}
             <a href="#favorites" className="action-item">
               <HeartIcon />
               <span>Favorites</span>
