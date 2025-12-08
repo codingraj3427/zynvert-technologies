@@ -23,6 +23,7 @@ import ContactSection from "./pages/Home/ContactSection";
 import PageLoader from "./components/common/LoadingSpinner/LoadingSpinner";
 import AccountPage from "./pages/Account/AccountPage";
 
+
 // ======== MOCK DATA (omitted for brevity) ========
 const popularCategories = [
   /* ... */
