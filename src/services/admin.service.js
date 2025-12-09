@@ -82,9 +82,9 @@ export const adminService = {
     return res.data;
   },
 
-  async deleteProduct(id) {
+  async deleteProduct(product_id) {
     const headers = await getAuthHeaders();
-    const res = await axios.delete(`${API_BASE_URL}/admin/products/${id}`, {
+    const res = await axios.delete(`${API_BASE_URL}/admin/products/${product_id}`, {
       headers,
     });
     return res.data;
@@ -115,4 +115,11 @@ export const adminService = {
     });
     return res.data;
   },
+  async getCategories() {
+  const headers = await getAuthHeaders();
+  const res = await axios.get(`${API_BASE_URL}/admin/categories`, { headers });
+  return res.data;
+},
 };
+
+
