@@ -7,7 +7,7 @@ import AdminProductsPage from "./AdminProductsPage";
 import AdminOrdersPage from "./AdminOrdersPage";
 import AdminCustomersPage from "./AdminCustomersPage";
 
-import "./admin.css"; // optional; create for styling
+import "./admin.css";
 
 const AdminSidebar = () => (
   <aside className="admin-sidebar">
@@ -33,10 +33,14 @@ const AdminLayout = () => {
   return (
     <div className="admin-layout">
       <AdminSidebar />
+
       <section className="admin-main">
+        {/* ===== Top Header ===== */}
         <header className="admin-topbar">
           <h1>Admin Panel</h1>
         </header>
+
+        {/* ===== Main Page Content ===== */}
         <div className="admin-content">
           <Routes>
             <Route index element={<AdminDashboardPage />} />
@@ -45,6 +49,13 @@ const AdminLayout = () => {
             <Route path="customers" element={<AdminCustomersPage />} />
           </Routes>
         </div>
+
+        {/* ===== ✅ Global Admin Footer ===== */}
+        <footer className="admin-footer">
+          <p>
+            © {new Date().getFullYear()} Zynvert Technologies • Admin Panel
+          </p>
+        </footer>
       </section>
     </div>
   );
