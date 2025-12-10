@@ -120,6 +120,38 @@ export const adminService = {
   const res = await axios.get(`${API_BASE_URL}/admin/categories`, { headers });
   return res.data;
 },
+
+  async uploadProductImage(file) {
+    const headers = await getAuthHeaders();
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await axios.post(
+      `${API_BASE_URL}/admin/products/upload-image`,
+      formData,
+      {
+        headers: {
+          ...headers,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // backend returns: { url: "https://...cloudinary..." }
+    return res.data;
+  },
+    async deleteProductImage(productId, imageUrl) {
+    const headers = await getAuthHeaders();
+    const res = await axios.delete(
+      `${API_BASE_URL}/admin/products/${productId}/images`,
+      {
+        headers,
+        data: { imageUrl }, // axios allows body in DELETE via "data"
+      }
+    );
+    return res.data;
+  },
+
 };
 
 
